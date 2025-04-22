@@ -79,10 +79,10 @@ const Dashboard: React.FC = () => {
         </div>
         <Button
           rightIcon={<ArrowRight size={16} />}
-          as={Link}
-          to="/frameworks/create"
         >
-          Create Framework
+          <Link to="/frameworks/create">
+            Create Framework
+          </Link>
         </Button>
       </div>
 
@@ -154,11 +154,11 @@ const Dashboard: React.FC = () => {
             <Button 
               className="w-full mt-4" 
               variant="outline"
-              as={Link}
-              to="/frameworks"
               rightIcon={<ArrowRight size={16} />}
             >
-              View All Frameworks
+              <Link to="/frameworks">
+                View All Frameworks
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -173,35 +173,33 @@ const Dashboard: React.FC = () => {
                 className="w-full justify-between mb-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
                 variant="outline"
                 rightIcon={<ArrowUpRight size={16} />}
-                as={Link}
-                to="/frameworks/create"
               >
-                Create New Framework
+                <Link to="/frameworks/create">
+                  Create New Framework
+                </Link>
               </Button>
               <Button
                 className="w-full justify-between mb-2"
                 variant="outline"
                 rightIcon={<ArrowUpRight size={16} />}
-                as={Link}
-                to="/frameworks"
               >
-                Manage Frameworks
+                <Link to="/frameworks">
+                  Manage Frameworks
+                </Link>
               </Button>
               <Button
                 className="w-full justify-between mb-2"
                 variant="outline"
                 rightIcon={<ArrowUpRight size={16} />}
-                as={Link}
-                to="/users"
               >
-                User Management
+                <Link to="/users">
+                  User Management
+                </Link>
               </Button>
               <Button
                 className="w-full justify-between"
                 variant="outline"
                 rightIcon={<ArrowUpRight size={16} />}
-                as={Link}
-                to="/settings"
               >
                 System Settings
               </Button>

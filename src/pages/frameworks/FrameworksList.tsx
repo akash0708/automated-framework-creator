@@ -51,19 +51,19 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
             size="sm"
             className="mr-2"
             rightIcon={<ArrowUpRight size={14} />}
-            as={Link}
-            to={`/frameworks/${id}`}
           >
-            View
+            <Link to={`/frameworks/${id}`}>
+              View
+            </Link>
           </Button>
           <Button
             variant="outline"
             size="sm"
             className="mr-2"
-            as={Link}
-            to={`/frameworks/${id}/edit`}
           >
-            Edit
+            <Link to={`/frameworks/${id}/edit`}>
+              Edit
+            </Link>  
           </Button>
         </div>
       </div>
@@ -72,7 +72,7 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
 };
 
 const FrameworksList: React.FC = () => {
-  // Sample data - in a real app this would come from an API
+  // Sample data - to be fetched using Framework List API
   const frameworks = [
     { 
       id: '1', 
@@ -127,10 +127,10 @@ const FrameworksList: React.FC = () => {
         </div>
         <Button
           leftIcon={<Plus size={16} />}
-          as={Link}
-          to="/frameworks/create"
         >
-          Create Framework
+          <Link to="/frameworks/create">
+            Create Framework
+          </Link>
         </Button>
       </div>
 

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle, 
-  ChevronRight, 
-  Plus, 
+  ChevronRight,
   ArrowLeft, 
   ArrowRight, 
   FileCheck, 
