@@ -152,11 +152,13 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
             </div>
           )}
 
-          {selectedTerm && otherTerms.length > 0 ? (
+          {otherTerms.length > 0 ? (
             <>
               <div className="mt-6">
                 <h3 className="text-lg font-medium mb-4">
-                  Associate "{selectedTerm.name}" with terms from other categories
+                  {selectedTerm 
+                    ? `Associate "${selectedTerm.name}" with terms from other categories`
+                    : 'Select a term to create associations'}
                 </h3>
                 <div className="space-y-3">
                   {otherTerms.map((item, index) => (
@@ -167,6 +169,7 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         checked={selectedAssociations.some(assoc => assoc.identifier === item.id)}
                         onChange={() => handleAssociationToggle(item.id)}
+                        disabled={!selectedTerm}
                       />
                       <label htmlFor={`term-${index}`} className="ml-2 block text-sm text-gray-900">
                         {item.term.name} <span className="text-gray-500">({item.category.name})</span>
@@ -177,6 +180,7 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
                 <Button
                   onClick={handleSaveAssociations}
                   className="mt-4 w-full sm:w-auto"
+                  disabled={!selectedTerm}
                 >
                   Save Associations
                 </Button>
@@ -207,11 +211,11 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
                 </Card>
               )}
             </>
-          ) : selectedTerm ? (
+          ) : (
             <div className="p-4 mt-4 rounded-md bg-amber-50 text-amber-800">
               No terms available in other categories for associations.
             </div>
-          ) : null}
+          )}
         </>
       )}
     </div>
