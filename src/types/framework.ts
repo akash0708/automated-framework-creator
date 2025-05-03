@@ -33,9 +33,17 @@ export interface Term {
 }
 
 export interface FrameworkFormData {
-  framework: Framework;
+  channel: {
+    name: string;
+    code: string;
+  };
+  framework: {
+    name: string;
+    code: string;
+    channels: Array<{ identifier: string }>;
+    description: string;
+    status: 'draft' | 'published';
+  };
   categories: Category[];
   step: number;
-  currentCategory?: Category;
-  currentTerm?: Term;
 }

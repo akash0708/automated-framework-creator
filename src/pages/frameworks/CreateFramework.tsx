@@ -9,11 +9,13 @@ import {
   ListTree, 
   Edit3, 
   Eye,
-  Send
+  Send,
+  Radio
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { FrameworkFormData, Category, Term } from '../../types/framework';
+import StepChannel from './steps/StepChannel';
 import StepFramework from './steps/StepFramework';
 import StepCategories from './steps/StepCategories';
 import StepTerms from './steps/StepTerms';
@@ -24,6 +26,10 @@ import { simulateApiCall } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 const INITIAL_FORM_DATA: FrameworkFormData = {
+  channel: {
+    name: '',
+    code: ''
+  },
   framework: {
     name: '',
     code: '',
@@ -36,12 +42,13 @@ const INITIAL_FORM_DATA: FrameworkFormData = {
 };
 
 const steps = [
-  { number: 1, title: 'Framework', icon: <FileCheck size={16} /> },
-  { number: 2, title: 'Categories', icon: <ListPlus size={16} /> },
-  { number: 3, title: 'Terms', icon: <ListTree size={16} /> },
-  { number: 4, title: 'Associations', icon: <Edit3 size={16} /> },
-  { number: 5, title: 'Review', icon: <Eye size={16} /> },
-  { number: 6, title: 'Publish', icon: <Send size={16} /> }
+  { number: 1, title: 'Channel', icon: <Radio size={16} /> },
+  { number: 2, title: 'Framework', icon: <FileCheck size={16} /> },
+  { number: 3, title: 'Categories', icon: <ListPlus size={16} /> },
+  { number: 4, title: 'Terms', icon: <ListTree size={16} /> },
+  { number: 5, title: 'Associations', icon: <Edit3 size={16} /> },
+  { number: 6, title: 'Review', icon: <Eye size={16} /> },
+  { number: 7, title: 'Publish', icon: <Send size={16} /> }
 ];
 
 const CreateFramework: React.FC = () => {
@@ -56,11 +63,16 @@ const CreateFramework: React.FC = () => {
       // Simulate API call based on current step
       switch(formData.step) {
         case 1:
+          await simulateApiCall('/channel/v1/create', 'POST', {
+            request: { channel: formData.channel }
+          });
+          break;
+        case 2:
           await simulateApiCall('/framework/v1/create', 'POST', {
             request: { framework: formData.framework }
           });
           break;
-        case 2:
+        case 3:
           if (formData.categories.length > 0) {
             for (const category of formData.categories) {
               await simulateApiCall('/framework/v1/category/create', 'POST', {
@@ -69,16 +81,16 @@ const CreateFramework: React.FC = () => {
             }
           }
           break;
-        case 3:
+        case 4:
           // Term creation would happen here
           break;
-        case 4:
+        case 5:
           // Associations would be updated here
           break;
-        case 5:
+        case 6:
           // Nothing to submit on review step
           break;
-        case 6:
+        case 7:
           await simulateApiCall('/framework/v1/publish', 'POST', {});
           // After successful publish, redirect to frameworks list
           navigate('/frameworks');
@@ -146,7 +158,7 @@ const CreateFramework: React.FC = () => {
   const updateTermAssociations = (
     categoryIndex: number, 
     termIndex: number, 
-    associationsWith: string[]
+    associationsWith: Array<{ identifier: string }>
   ) => {
     setFormData(prev => {
       const updatedCategories = [...prev.categories];
@@ -155,7 +167,7 @@ const CreateFramework: React.FC = () => {
       if (terms[termIndex]) {
         terms[termIndex] = {
           ...terms[termIndex],
-          associationsWith
+          associationsWith: associationsWith.map(assoc => assoc.identifier)
         };
       }
       
@@ -164,6 +176,13 @@ const CreateFramework: React.FC = () => {
         categories: updatedCategories
       };
     });
+  };
+
+  const updateChannelData = (channelData: { name: string; code: string }) => {
+    setFormData(prev => ({
+      ...prev,
+      channel: channelData
+    }));
   };
 
   return (
@@ -216,13 +235,20 @@ const CreateFramework: React.FC = () => {
         
         <CardContent>
           {formData.step === 1 && (
+            <StepChannel 
+              channelData={formData.channel}
+              updateChannelData={updateChannelData}
+            />
+          )}
+          
+          {formData.step === 2 && (
             <StepFramework 
               frameworkData={formData.framework}
               updateFrameworkData={updateFrameworkData}
             />
           )}
           
-          {formData.step === 2 && (
+          {formData.step === 3 && (
             <StepCategories
               categories={formData.categories}
               updateCategories={updateCategories}
@@ -230,27 +256,27 @@ const CreateFramework: React.FC = () => {
             />
           )}
           
-          {formData.step === 3 && (
+          {formData.step === 4 && (
             <StepTerms
               categories={formData.categories}
               addTermToCategory={addTermToCategory}
             />
           )}
           
-          {formData.step === 4 && (
+          {formData.step === 5 && (
             <StepAssociations
               categories={formData.categories}
               updateTermAssociations={updateTermAssociations}
             />
           )}
           
-          {formData.step === 5 && (
+          {formData.step === 6 && (
             <StepReview
               formData={formData}
             />
           )}
           
-          {formData.step === 6 && (
+          {formData.step === 7 && (
             <StepPublish
               formData={formData}
             />

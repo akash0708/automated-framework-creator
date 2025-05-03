@@ -10,7 +10,7 @@ interface StepAssociationsProps {
   updateTermAssociations: (
     categoryIndex: number,
     termIndex: number,
-    associationsWith: string[]
+    associationsWith: Array<{ identifier: string }>
   ) => void;
 }
 
@@ -22,7 +22,7 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
     categories.length > 0 ? 0 : null
   );
   const [selectedTermIndex, setSelectedTermIndex] = useState<number | null>(null);
-  const [selectedAssociations, setSelectedAssociations] = useState<string[]>([]);
+  const [selectedAssociations, setSelectedAssociations] = useState<Array<{ identifier: string }>>([]);
   const [error, setError] = useState('');
 
   const handleCategoryChange = (value: string) => {
@@ -41,7 +41,8 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
       const category = categories[selectedCategoryIndex];
       const term = category.terms?.[index];
       if (term && term.associationsWith) {
-        setSelectedAssociations(term.associationsWith);
+        // Transform string array to required format
+        setSelectedAssociations(term.associationsWith.map(id => ({ identifier: id })));
       } else {
         setSelectedAssociations([]);
       }
@@ -50,10 +51,11 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
 
   const handleAssociationToggle = (termId: string) => {
     setSelectedAssociations(prev => {
-      if (prev.includes(termId)) {
-        return prev.filter(id => id !== termId);
+      const identifier = { identifier: termId };
+      if (prev.some(assoc => assoc.identifier === termId)) {
+        return prev.filter(assoc => assoc.identifier !== termId);
       } else {
-        return [...prev, termId];
+        return [...prev, identifier];
       }
     });
   };
@@ -163,7 +165,7 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
                         type="checkbox"
                         id={`term-${index}`}
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        checked={selectedAssociations.includes(item.id)}
+                        checked={selectedAssociations.some(assoc => assoc.identifier === item.id)}
                         onChange={() => handleAssociationToggle(item.id)}
                       />
                       <label htmlFor={`term-${index}`} className="ml-2 block text-sm text-gray-900">
@@ -185,8 +187,8 @@ const StepAssociations: React.FC<StepAssociationsProps> = ({
                   <CardContent className="p-4">
                     <h4 className="font-medium mb-2">Current Associations</h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedAssociations.map((assocId, index) => {
-                        const [categoryCode, termCode] = assocId.split(':');
+                      {selectedAssociations.map((assoc, index) => {
+                        const [categoryCode, termCode] = assoc.identifier.split(':');
                         const matchedItem = otherTerms.find(
                           item => item.category.code === categoryCode && item.term.code === termCode
                         );
