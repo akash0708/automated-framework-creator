@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
-import { FrameworkFormData, Category, Term } from '../../types/framework';
+import { Category, Term } from '../../types/framework';
 import StepChannel from './steps/StepChannel';
 import StepFramework from './steps/StepFramework';
 import StepCategories from './steps/StepCategories';
@@ -24,22 +24,7 @@ import StepReview from './steps/StepReview';
 import StepPublish from './steps/StepPublish';
 import { simulateApiCall } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
-
-const INITIAL_FORM_DATA: FrameworkFormData = {
-  channel: {
-    name: '',
-    code: ''
-  },
-  framework: {
-    name: '',
-    code: '',
-    channels: [{ identifier: 'in.ekstep' }],
-    description: '',
-    status: 'draft'
-  },
-  categories: [],
-  step: 1
-};
+import { useFrameworkFormStore } from '../../store/frameworkFormStore';
 
 const steps = [
   { number: 1, title: 'Channel', icon: <Radio size={16} /> },
@@ -52,32 +37,39 @@ const steps = [
 ];
 
 const CreateFramework: React.FC = () => {
-  const [formData, setFormData] = useState<FrameworkFormData>(INITIAL_FORM_DATA);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Zustand store hooks
+  const {
+    channel,
+    framework,
+    categories,
+    step,
+    setStep,
+    setChannel,
+    setFramework,
+    setCategories,
+    setCurrentCategory,
+    addTermToCategory,
+    updateTermAssociations,
+    reset
+  } = useFrameworkFormStore();
 
   const handleNext = async () => {
     setIsLoading(true);
-    
     try {
-      // Simulate API call based on current step
-      switch(formData.step) {
+      switch (step) {
         case 1:
-          await simulateApiCall('/channel/v1/create', 'POST', {
-            request: { channel: formData.channel }
-          });
+          await simulateApiCall('/channel/v1/create', 'POST', { request: { channel } });
           break;
         case 2:
-          await simulateApiCall('/framework/v1/create', 'POST', {
-            request: { framework: formData.framework }
-          });
+          await simulateApiCall('/framework/v1/create', 'POST', { request: { framework } });
           break;
         case 3:
-          if (formData.categories.length > 0) {
-            for (const category of formData.categories) {
-              await simulateApiCall('/framework/v1/category/create', 'POST', {
-                request: { category }
-              });
+          if (categories.length > 0) {
+            for (const category of categories) {
+              await simulateApiCall('/framework/v1/category/create', 'POST', { request: { category } });
             }
           }
           break;
@@ -92,15 +84,10 @@ const CreateFramework: React.FC = () => {
           break;
         case 7:
           await simulateApiCall('/framework/v1/publish', 'POST', {});
-          // After successful publish, redirect to frameworks list
           navigate('/frameworks');
           return;
       }
-      
-      // Move to next step if not the final step
-      if (formData.step < steps.length) {
-        setFormData(prev => ({ ...prev, step: prev.step + 1 }));
-      }
+      if (step < steps.length) setStep(step + 1);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -109,80 +96,9 @@ const CreateFramework: React.FC = () => {
   };
 
   const handleBack = () => {
-    if (formData.step > 1) {
-      setFormData(prev => ({ ...prev, step: prev.step - 1 }));
+    if (step > 1) {
+      setStep(step - 1);
     }
-  };
-
-  const updateFrameworkData = (frameworkData: any) => {
-    setFormData(prev => ({
-      ...prev,
-      framework: {
-        ...prev.framework,
-        ...frameworkData
-      }
-    }));
-  };
-
-  const updateCategories = (categories: Category[]) => {
-    setFormData(prev => ({
-      ...prev,
-      categories
-    }));
-  };
-
-  const setCurrentCategory = (category: Category) => {
-    setFormData(prev => ({
-      ...prev,
-      currentCategory: category
-    }));
-  };
-
-  const addTermToCategory = (categoryIndex: number, term: Term) => {
-    setFormData(prev => {
-      const updatedCategories = [...prev.categories];
-      
-      if (!updatedCategories[categoryIndex].terms) {
-        updatedCategories[categoryIndex].terms = [];
-      }
-      
-      updatedCategories[categoryIndex].terms?.push(term);
-      
-      return {
-        ...prev,
-        categories: updatedCategories
-      };
-    });
-  };
-
-  const updateTermAssociations = (
-    categoryIndex: number, 
-    termIndex: number, 
-    associationsWith: Array<{ identifier: string }>
-  ) => {
-    setFormData(prev => {
-      const updatedCategories = [...prev.categories];
-      const terms = updatedCategories[categoryIndex].terms || [];
-      
-      if (terms[termIndex]) {
-        terms[termIndex] = {
-          ...terms[termIndex],
-          associationsWith: associationsWith.map(assoc => assoc.identifier)
-        };
-      }
-      
-      return {
-        ...prev,
-        categories: updatedCategories
-      };
-    });
-  };
-
-  const updateChannelData = (channelData: { name: string; code: string }) => {
-    setFormData(prev => ({
-      ...prev,
-      channel: channelData
-    }));
   };
 
   return (
@@ -196,22 +112,22 @@ const CreateFramework: React.FC = () => {
 
       <div className="flex justify-between items-center py-4 overflow-x-auto">
         <div className="flex items-center">
-          {steps.map((step, i) => (
+          {steps.map((stepObj, i) => (
             <div 
-              key={step.number}
-              className={`step-item ${formData.step === step.number ? 'active' : ''} ${formData.step > step.number ? 'complete' : ''}`}
+              key={stepObj.number}
+              className={`step-item ${step === stepObj.number ? 'active' : ''} ${step > stepObj.number ? 'complete' : ''}`}
             >
               <div 
-                className={`step ${formData.step === step.number ? 'active' : ''} ${formData.step > step.number ? 'complete' : ''}`}
+                className={`step ${step === stepObj.number ? 'active' : ''} ${step > stepObj.number ? 'complete' : ''}`}
               >
-                {formData.step > step.number ? (
+                {step > stepObj.number ? (
                   <CheckCircle size={16} />
                 ) : (
-                  step.number
+                  stepObj.number
                 )}
               </div>
               <p className="text-xs font-medium mt-1">
-                {step.title}
+                {stepObj.title}
               </p>
               {i < steps.length - 1 && (
                 <div className="hidden sm:block absolute -right-3 top-1/3 transform -translate-y-1/2">
@@ -227,58 +143,52 @@ const CreateFramework: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <span className="p-2 rounded-full bg-indigo-50 text-indigo-600 mr-3">
-              {steps[formData.step - 1].icon}
+              {steps[step - 1].icon}
             </span>
-            Step {formData.step}: {steps[formData.step - 1].title}
+            Step {step}: {steps[step - 1].title}
           </CardTitle>
         </CardHeader>
         
         <CardContent>
-          {formData.step === 1 && (
+          {step === 1 && (
             <StepChannel 
-              channelData={formData.channel}
-              updateChannelData={updateChannelData}
+              channelData={channel}
+              updateChannelData={setChannel}
             />
           )}
-          
-          {formData.step === 2 && (
+          {step === 2 && (
             <StepFramework 
-              frameworkData={formData.framework}
-              updateFrameworkData={updateFrameworkData}
+              frameworkData={framework}
+              updateFrameworkData={setFramework}
             />
           )}
-          
-          {formData.step === 3 && (
+          {step === 3 && (
             <StepCategories
-              categories={formData.categories}
-              updateCategories={updateCategories}
+              categories={categories}
+              updateCategories={setCategories}
               setCurrentCategory={setCurrentCategory}
             />
           )}
-          
-          {formData.step === 4 && (
+          {step === 4 && (
             <StepTerms
-              categories={formData.categories}
+              categories={categories}
               addTermToCategory={addTermToCategory}
             />
           )}
-          
-          {formData.step === 5 && (
+          {step === 5 && (
             <StepAssociations
-              categories={formData.categories}
+              categories={categories}
               updateTermAssociations={updateTermAssociations}
             />
           )}
-          
-          {formData.step === 6 && (
+          {step === 6 && (
             <StepReview
-              formData={formData}
+              formData={{ channel, framework, categories, step }}
             />
           )}
-          
-          {formData.step === 7 && (
+          {step === 7 && (
             <StepPublish
-              formData={formData}
+              formData={{ channel, framework, categories, step }}
             />
           )}
         </CardContent>
@@ -287,18 +197,17 @@ const CreateFramework: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleBack}
-            disabled={formData.step === 1 || isLoading}
+            disabled={step === 1 || isLoading}
             leftIcon={<ArrowLeft size={16} />}
           >
             Back
           </Button>
-          
           <Button
             onClick={handleNext}
             isLoading={isLoading}
-            rightIcon={formData.step < steps.length ? <ArrowRight size={16} /> : undefined}
+            rightIcon={step < steps.length ? <ArrowRight size={16} /> : undefined}
           >
-            {formData.step < steps.length ? 'Continue' : 'Publish Framework'}
+            {step < steps.length ? 'Continue' : 'Publish Framework'}
           </Button>
         </CardFooter>
       </Card>
