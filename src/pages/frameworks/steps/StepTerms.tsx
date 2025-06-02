@@ -6,16 +6,11 @@ import Textarea from '../../../components/ui/Textarea';
 import Select from '../../../components/ui/Select';
 import { Category, Term } from '../../../types/framework';
 import { Card, CardContent } from '../../../components/ui/Card';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 
-interface StepTermsProps {
-  categories: Category[];
-  addTermToCategory: (categoryIndex: number, term: Term) => void;
-}
-
-const StepTerms: React.FC<StepTermsProps> = ({
-  categories,
-  addTermToCategory
-}) => {
+const StepTerms: React.FC = () => {
+  const categories = useFrameworkFormStore((state) => state.categories);
+  const addTermToCategory = useFrameworkFormStore((state) => state.addTermToCategory);
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number | null>(
     categories.length > 0 ? 0 : null
   );

@@ -1,14 +1,11 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { FrameworkFormData } from '../../../types/framework';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 import { Card, CardContent } from '../../../components/ui/Card';
 
-interface StepPublishProps {
-  formData: FrameworkFormData;
-}
-
-const StepPublish: React.FC<StepPublishProps> = ({ formData }) => {
-  const { framework } = formData;
+const StepPublish: React.FC = () => {
+  const framework = useFrameworkFormStore((state) => state.framework);
+  const categories = useFrameworkFormStore((state) => state.categories);
 
   return (
     <div className="space-y-6 animate-slide-in">
@@ -39,10 +36,10 @@ const StepPublish: React.FC<StepPublishProps> = ({ formData }) => {
         <ul className="mt-2 space-y-1 text-sm">
           <li><span className="font-medium">Name:</span> {framework.name}</li>
           <li><span className="font-medium">Code:</span> {framework.code}</li>
-          <li><span className="font-medium">Categories:</span> {formData.categories.length}</li>
+          <li><span className="font-medium">Categories:</span> {categories.length}</li>
           <li>
             <span className="font-medium">Terms:</span> {
-              formData.categories.reduce((count, category) => 
+              categories.reduce((count, category) => 
                 count + (category.terms?.length || 0), 0
               )
             }

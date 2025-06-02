@@ -1,17 +1,12 @@
 import React from 'react';
 import Input from '../../../components/ui/Input';
 import Textarea from '../../../components/ui/Textarea';
-import { Framework } from '../../../types/framework';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 
-interface StepFrameworkProps {
-  frameworkData: Framework;
-  updateFrameworkData: (data: Partial<Framework>) => void;
-}
+const StepFramework: React.FC = () => {
+  const framework = useFrameworkFormStore((state) => state.framework);
+  const setFramework = useFrameworkFormStore((state) => state.setFramework);
 
-const StepFramework: React.FC<StepFrameworkProps> = ({ 
-  frameworkData, 
-  updateFrameworkData 
-}) => {
   return (
     <div className="space-y-6 animate-slide-in">
       <div className="mb-6">
@@ -26,8 +21,8 @@ const StepFramework: React.FC<StepFrameworkProps> = ({
       <div className="grid gap-6 sm:grid-cols-2">
         <Input
           label="Framework Name"
-          value={frameworkData.name}
-          onChange={(e) => updateFrameworkData({ name: e.target.value })}
+          value={framework.name}
+          onChange={(e) => setFramework({ name: e.target.value })}
           placeholder="e.g., Mathematics Framework"
           hint="Name should be descriptive and unique"
           required
@@ -35,8 +30,8 @@ const StepFramework: React.FC<StepFrameworkProps> = ({
 
         <Input
           label="Framework Code"
-          value={frameworkData.code}
-          onChange={(e) => updateFrameworkData({ code: e.target.value })}
+          value={framework.code}
+          onChange={(e) => setFramework({ code: e.target.value })}
           placeholder="e.g., math_framework"
           hint="Code must be unique and use underscores"
           required
@@ -45,8 +40,8 @@ const StepFramework: React.FC<StepFrameworkProps> = ({
 
       <Textarea
         label="Description"
-        value={frameworkData.description || ''}
-        onChange={(e) => updateFrameworkData({ description: e.target.value })}
+        value={framework.description || ''}
+        onChange={(e) => setFramework({ description: e.target.value })}
         placeholder="Describe the purpose and scope of this framework"
         rows={4}
       />

@@ -1,13 +1,10 @@
 import React from 'react';
-import { FrameworkFormData } from '../../../types/framework';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 
-interface StepReviewProps {
-  formData: FrameworkFormData;
-}
-
-const StepReview: React.FC<StepReviewProps> = ({ formData }) => {
-  const { framework, categories } = formData;
+const StepReview: React.FC = () => {
+  const framework = useFrameworkFormStore((state) => state.framework);
+  const categories = useFrameworkFormStore((state) => state.categories);
 
   return (
     <div className="space-y-6 animate-slide-in">

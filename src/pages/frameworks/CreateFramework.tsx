@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Category, Term } from '../../types/framework';
 import StepChannel from './steps/StepChannel';
 import StepFramework from './steps/StepFramework';
 import StepCategories from './steps/StepCategories';
@@ -39,22 +38,7 @@ const steps = [
 const CreateFramework: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-  // Zustand store hooks
-  const {
-    channel,
-    framework,
-    categories,
-    step,
-    setStep,
-    setChannel,
-    setFramework,
-    setCategories,
-    setCurrentCategory,
-    addTermToCategory,
-    updateTermAssociations,
-    reset
-  } = useFrameworkFormStore();
+  const { channel, framework, categories, step, setStep, reset } = useFrameworkFormStore();
 
   const handleNext = async () => {
     setIsLoading(true);
@@ -150,47 +134,13 @@ const CreateFramework: React.FC = () => {
         </CardHeader>
         
         <CardContent>
-          {step === 1 && (
-            <StepChannel 
-              channelData={channel}
-              updateChannelData={setChannel}
-            />
-          )}
-          {step === 2 && (
-            <StepFramework 
-              frameworkData={framework}
-              updateFrameworkData={setFramework}
-            />
-          )}
-          {step === 3 && (
-            <StepCategories
-              categories={categories}
-              updateCategories={setCategories}
-              setCurrentCategory={setCurrentCategory}
-            />
-          )}
-          {step === 4 && (
-            <StepTerms
-              categories={categories}
-              addTermToCategory={addTermToCategory}
-            />
-          )}
-          {step === 5 && (
-            <StepAssociations
-              categories={categories}
-              updateTermAssociations={updateTermAssociations}
-            />
-          )}
-          {step === 6 && (
-            <StepReview
-              formData={{ channel, framework, categories, step }}
-            />
-          )}
-          {step === 7 && (
-            <StepPublish
-              formData={{ channel, framework, categories, step }}
-            />
-          )}
+          {step === 1 && <StepChannel />}
+          {step === 2 && <StepFramework />}
+          {step === 3 && <StepCategories />}
+          {step === 4 && <StepTerms />}
+          {step === 5 && <StepAssociations />}
+          {step === 6 && <StepReview />}
+          {step === 7 && <StepPublish />}
         </CardContent>
         
         <CardFooter className="flex justify-between border-t border-border pt-4">

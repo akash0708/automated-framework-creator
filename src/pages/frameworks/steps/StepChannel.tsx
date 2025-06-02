@@ -1,15 +1,11 @@
 import React from 'react';
 import Input from '../../../components/ui/Input';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 
-interface StepChannelProps {
-  channelData: {
-    name: string;
-    code: string;
-  };
-  updateChannelData: (data: { name: string; code: string }) => void;
-}
+const StepChannel: React.FC = () => {
+  const channel = useFrameworkFormStore((state) => state.channel);
+  const setChannel = useFrameworkFormStore((state) => state.setChannel);
 
-const StepChannel: React.FC<StepChannelProps> = ({ channelData, updateChannelData }) => {
   return (
     <div className="space-y-6 animate-slide-in">
       <div className="mb-6">
@@ -24,8 +20,8 @@ const StepChannel: React.FC<StepChannelProps> = ({ channelData, updateChannelDat
       <div className="grid gap-6 sm:grid-cols-2">
         <Input
           label="Channel Name"
-          value={channelData.name}
-          onChange={(e) => updateChannelData({ ...channelData, name: e.target.value })}
+          value={channel.name}
+          onChange={(e) => setChannel({ ...channel, name: e.target.value })}
           placeholder="e.g., Youthnet Channel"
           hint="Name should be descriptive and unique"
           required
@@ -33,8 +29,8 @@ const StepChannel: React.FC<StepChannelProps> = ({ channelData, updateChannelDat
 
         <Input
           label="Channel Code"
-          value={channelData.code}
-          onChange={(e) => updateChannelData({ ...channelData, code: e.target.value })}
+          value={channel.code}
+          onChange={(e) => setChannel({ ...channel, code: e.target.value })}
           placeholder="e.g., youthnet-channel"
           hint="Code must be unique and use hyphens"
           required

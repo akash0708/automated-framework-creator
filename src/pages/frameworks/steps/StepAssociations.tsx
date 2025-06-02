@@ -3,21 +3,11 @@ import { AlertTriangle, ChevronRight, CheckCircle } from 'lucide-react';
 import Select from '../../../components/ui/Select';
 import Button from '../../../components/ui/Button';
 import { Card, CardContent } from '../../../components/ui/Card';
-import { Category, Term } from '../../../types/framework';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 
-interface StepAssociationsProps {
-  categories: Category[];
-  updateTermAssociations: (
-    categoryIndex: number,
-    termIndex: number,
-    associationsWith: Array<{ identifier: string }>
-  ) => void;
-}
-
-const StepAssociations: React.FC<StepAssociationsProps> = ({
-  categories,
-  updateTermAssociations
-}) => {
+const StepAssociations: React.FC = () => {
+  const categories = useFrameworkFormStore((state) => state.categories);
+  const updateTermAssociations = useFrameworkFormStore((state) => state.updateTermAssociations);
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number | null>(null);
   const [selectedTermIndex, setSelectedTermIndex] = useState<number | null>(null);
   const [selectedAssociations, setSelectedAssociations] = useState<Array<{ identifier: string }>>([]);

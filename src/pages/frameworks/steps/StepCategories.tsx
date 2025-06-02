@@ -5,18 +5,13 @@ import Input from '../../../components/ui/Input';
 import Textarea from '../../../components/ui/Textarea';
 import { Category } from '../../../types/framework';
 import { Card, CardContent } from '../../../components/ui/Card';
+import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 
-interface StepCategoriesProps {
-  categories: Category[];
-  updateCategories: (categories: Category[]) => void;
-  setCurrentCategory: (category: Category) => void;
-}
+const StepCategories: React.FC = () => {
+  const categories = useFrameworkFormStore((state) => state.categories);
+  const setCategories = useFrameworkFormStore((state) => state.setCategories);
+  const setCurrentCategory = useFrameworkFormStore((state) => state.setCurrentCategory);
 
-const StepCategories: React.FC<StepCategoriesProps> = ({
-  categories,
-  updateCategories,
-  setCurrentCategory
-}) => {
   const [newCategory, setNewCategory] = useState<Category>({
     name: '',
     code: '',
@@ -37,7 +32,7 @@ const StepCategories: React.FC<StepCategoriesProps> = ({
       return;
     }
 
-    updateCategories([...categories, { ...newCategory }]);
+    setCategories([...categories, { ...newCategory }]);
     setNewCategory({ name: '', code: '', description: '' });
     setError('');
   };
@@ -45,7 +40,7 @@ const StepCategories: React.FC<StepCategoriesProps> = ({
   const handleRemoveCategory = (index: number) => {
     const updatedCategories = [...categories];
     updatedCategories.splice(index, 1);
-    updateCategories(updatedCategories);
+    setCategories(updatedCategories);
   };
 
   return (
