@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
         <div className="flex h-14 items-center justify-between px-4 border-b border-border">
           <Link to="/" className="flex items-center">
             <Layers className="h-6 w-6 text-indigo-600" />
-            <span className="ml-2 text-lg font-semibold">Admin Portal</span>
+            <span className="ml-2 text-lg font-semibold">Taxonomy Editor</span>
           </Link>
           <button
             className="rounded-md p-1 text-slate-500 hover:bg-slate-100 lg:hidden"
@@ -151,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
                 )}
                 onClick={closeMobileMenu}
               >
-                All Frameworks
+                View All Frameworks
               </Link>
               <Link 
                 to="/frameworks/create" 
@@ -163,41 +163,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
                 )}
                 onClick={closeMobileMenu}
               >
-                Create Framework
+                Create New Framework
               </Link>
             </NavItem>
-
-            <NavItem 
-              to="/users" 
-              icon={<Users size={18} />} 
-              label="Users"
-              active={location.pathname.includes('/users')} 
-              onClick={closeMobileMenu}
-            />
-
-            <NavItem 
-              to="/content" 
-              icon={<FileText size={18} />} 
-              label="Content"
-              active={location.pathname.includes('/content')} 
-              onClick={closeMobileMenu}
-            />
-
-            <NavItem 
-              to="/analytics" 
-              icon={<BarChart size={18} />} 
-              label="Analytics"
-              active={location.pathname.includes('/analytics')} 
-              onClick={closeMobileMenu}
-            />
-
-            <NavItem 
-              to="/settings" 
-              icon={<Settings size={18} />} 
-              label="Settings"
-              active={location.pathname.includes('/settings')} 
-              onClick={closeMobileMenu}
-            />
           </ul>
         </nav>
       </aside>

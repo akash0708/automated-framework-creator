@@ -75,7 +75,6 @@ const Dashboard: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back to your admin portal</p>
         </div>
         <Button
           rightIcon={<ArrowRight size={16} />}
@@ -94,27 +93,27 @@ const Dashboard: React.FC = () => {
           trend={{ value: "12.5%", positive: true }}
         />
         <StatCard
+          title="Master Categories"
+          value="12"
+          icon={<Layers className="h-5 w-5 text-indigo-600" />}
+          trend={{ value: "3.1%", positive: true }}
+        />
+        <StatCard
           title="Total Categories"
           value="48"
           icon={<FileText className="h-5 w-5 text-indigo-600" />}
           trend={{ value: "8.2%", positive: true }}
         />
         <StatCard
-          title="Active Users"
-          value="1,023"
-          icon={<Users className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "4.1%", positive: true }}
-        />
-        <StatCard
-          title="API Calls (24h)"
-          value="13.5k"
-          icon={<BarChart className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "2.3%", positive: false }}
+          title="Terms"
+          value="320"
+          icon={<FileText className="h-5 w-5 text-indigo-600" />}
+          trend={{ value: "5.6%", positive: true }}
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="md:col-span-2 animate-fade-in">
+      <div className="grid gap-6">
+        <Card className="animate-fade-in">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
@@ -156,54 +155,10 @@ const Dashboard: React.FC = () => {
               variant="outline"
               rightIcon={<ArrowRight size={16} />}
             >
-              <Link to="/frameworks">
+              <Link to="/frameworks/">
                 View All Frameworks
               </Link>
             </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="animate-fade-in">
-          <CardHeader>
-            <CardTitle>Quick Links</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Button
-                className="w-full justify-between mb-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-                variant="outline"
-                rightIcon={<ArrowUpRight size={16} />}
-              >
-                <Link to="/frameworks/create">
-                  Create New Framework
-                </Link>
-              </Button>
-              <Button
-                className="w-full justify-between mb-2"
-                variant="outline"
-                rightIcon={<ArrowUpRight size={16} />}
-              >
-                <Link to="/frameworks">
-                  Manage Frameworks
-                </Link>
-              </Button>
-              <Button
-                className="w-full justify-between mb-2"
-                variant="outline"
-                rightIcon={<ArrowUpRight size={16} />}
-              >
-                <Link to="/users">
-                  User Management
-                </Link>
-              </Button>
-              <Button
-                className="w-full justify-between"
-                variant="outline"
-                rightIcon={<ArrowUpRight size={16} />}
-              >
-                System Settings
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>

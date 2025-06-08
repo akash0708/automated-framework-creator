@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
+import AssociationCategories from '../../components/ui/AssociationCategories';
 // import Tabs, Tab from your UI library or implement simple tabs
 
 // Types for framework and categories
@@ -165,7 +166,7 @@ const FrameworkDetails: React.FC = () => {
       <h2 className="text-2xl font-bold mb-4">Categories</h2>
 
       {liveCategories.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           {liveCategories.map((category) => (
             <Card key={category.identifier} className="shadow-md">
               <CardHeader className="bg-slate-50 border-b">
@@ -198,33 +199,22 @@ const FrameworkDetails: React.FC = () => {
                               <td className="px-3 py-2 text-base">{term.description}</td>
                               <td className="px-3 py-2 text-base">
                                 {term.associations && term.associations.length > 0 ? (
-                                  // Group associations by category
                                   (() => {
                                     const liveAssocs = term.associations.filter((assoc) => assoc.status === 'Live');
                                     if (liveAssocs.length === 0) return <span className="text-muted-foreground">No associations</span>;
+                                    // Group associations by category and map to the new component's expected format
                                     const grouped: { [cat: string]: Association[] } = {};
                                     liveAssocs.forEach((assoc) => {
                                       if (!grouped[assoc.category]) grouped[assoc.category] = [];
                                       grouped[assoc.category].push(assoc);
                                     });
-                                    return (
-                                      <div className="space-y-1">
-                                        {Object.entries(grouped).map(([cat, assocs]) => (
-                                          <div key={cat}>
-                                            <span className="font-semibold text-xs bg-slate-100 rounded px-2 py-0.5 mr-2 text-slate-700 inline-block mb-1">
-                                              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                                            </span>
-                                            <div className="flex flex-wrap gap-1 mb-1">
-                                              {assocs.map((assoc) => (
-                                                <Badge key={assoc.identifier} className="bg-indigo-100 text-indigo-800">
-                                                  {assoc.name}
-                                                </Badge>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    );
+                                    // Convert to array of { name, identifier, terms: [{identifier, name}] }
+                                    const categories = Object.entries(grouped).map(([cat, assocs]) => ({
+                                      name: cat.charAt(0).toUpperCase() + cat.slice(1),
+                                      identifier: cat,
+                                      terms: assocs.map(a => ({ identifier: a.identifier, name: a.name }))
+                                    }));
+                                    return <AssociationCategories categories={categories} />;
                                   })()
                                 ) : (
                                   <span className="text-muted-foreground">No associations</span>
