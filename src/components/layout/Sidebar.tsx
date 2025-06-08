@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Settings, 
-  Users, 
-  FileText, 
-  BarChart, 
   Layers, 
-  Menu, 
   X, 
   ChevronDown
 } from 'lucide-react';

@@ -214,7 +214,7 @@ const FrameworkDetails: React.FC = () => {
                                       identifier: cat,
                                       terms: assocs.map(a => ({ identifier: a.identifier, name: a.name }))
                                     }));
-                                    return <AssociationCategories categories={categories} />;
+                                    return <AssociationCategories categories={categories} termName={term.name} />;
                                   })()
                                 ) : (
                                   <span className="text-muted-foreground">No associations</span>

@@ -16,25 +16,35 @@ interface Category {
 
 interface AssociationCategoriesProps {
   categories: Category[];
+  termName?: string;
+  categoryName?: string;
 }
 
-const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categories }) => {
+const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categories, termName, categoryName }) => {
   const [showModal, setShowModal] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [modalTitle, setModalTitle] = useState<string>('All Categories');
 
   const handleShowMore = () => {
     setShowModal(true);
     setExpandedCategory(null);
+    setModalTitle('All Categories');
   };
 
-  const handleBadgeClick = (id: string) => {
+  const handleBadgeClick = (id: string, catName: string) => {
     setShowModal(true);
     setExpandedCategory(id);
+    setModalTitle(
+      termName && catName
+        ? `Association for Term ${termName} of Category ${catName}`
+        : 'All Categories'
+    );
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setExpandedCategory(null);
+    setModalTitle('All Categories');
   };
 
   const handleCategoryClick = (id: string) => {
@@ -44,6 +54,23 @@ const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categorie
   const visibleCategories = categories.slice(0, 4);
   const hasMore = categories.length > 4;
 
+  // Helper to render highlighted modal title
+  const renderModalTitle = () => {
+    if (modalTitle.startsWith('Association for Term') && modalTitle.includes('of Category')) {
+      // Extract term and category
+      const match = modalTitle.match(/^Association for Term (.+) of Category (.+)$/);
+      if (match) {
+        const [, term, category] = match;
+        return (
+          <span>
+            Association for Term <span className="font-bold text-indigo-600">{term}</span> of Category <span className="font-bold text-indigo-600">{category}</span>
+          </span>
+        );
+      }
+    }
+    return modalTitle;
+  };
+
   return (
     <div>
       <div className="flex flex-wrap gap-1">
@@ -51,7 +78,7 @@ const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categorie
           <span
             key={cat.identifier}
             className="cursor-pointer relative group"
-            onClick={() => handleBadgeClick(cat.identifier)}
+            onClick={() => handleBadgeClick(cat.identifier, cat.name)}
           >
             <Badge className="bg-indigo-100 text-indigo-800">
               {cat.name}
@@ -65,7 +92,7 @@ const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categorie
           <Button size="sm" variant="outline" onClick={handleShowMore} className="ml-1 px-2 py-0.5 text-xs">Show More</Button>
         )}
       </div>
-      <Modal open={showModal} onClose={handleCloseModal} title="All Categories">
+      <Modal open={showModal} onClose={handleCloseModal} title={renderModalTitle()}>
         <div className="space-y-2">
           {categories.map(cat => (
             <div key={cat.identifier}>
