@@ -56,17 +56,12 @@ const AssociationCategories: React.FC<AssociationCategoriesProps> = ({ categorie
 
   // Helper to render highlighted modal title
   const renderModalTitle = () => {
-    if (modalTitle.startsWith('Association for Term') && modalTitle.includes('of Category')) {
-      // Extract term and category
-      const match = modalTitle.match(/^Association for Term (.+) of Category (.+)$/);
-      if (match) {
-        const [, term, category] = match;
-        return (
-          <span>
-            Association for Term <span className="font-bold text-indigo-600">{term}</span> of Category <span className="font-bold text-indigo-600">{category}</span>
-          </span>
-        );
-      }
+    if (termName && categoryName) {
+      return (
+        <span>
+          Association for Term <span className="font-bold text-indigo-600">{termName}</span> of Category <span className="font-bold text-indigo-600">{categoryName}</span>
+        </span>
+      );
     }
     return modalTitle;
   };
