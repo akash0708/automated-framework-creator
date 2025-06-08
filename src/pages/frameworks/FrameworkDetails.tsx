@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 // import Tabs, Tab from your UI library or implement simple tabs
@@ -50,449 +51,61 @@ interface Framework {
     categories: Category[];
 }
 
-// Mocked framework data (replace with API/fetch logic as needed)
-// const framework: Framework = {
-//   name: 'Vidya-framework',
-//   status: 'Live',
-//   channel: 'c4gt-test-channel',
-//   description: 'This is a Framework for testing and UI implementation for C4GT',
-//   lastUpdatedOn: '2025-06-04T16:54:05.354+0000',
-//   categories: [] // Fill with real data or mock data as needed
-// };
-
-const framework: Framework = {
-    lastStatusChangedOn: "2025-06-04T16:41:33.748+0000",
-    name: "Vidya-framework",
-    createdOn: "2025-06-04T16:41:33.748+0000",
-    channel: "c4gt-test-channel",
-    lastUpdatedOn: "2025-06-04T16:54:05.354+0000",
-    identifier: "vidya-framework",
-    description: "This is a Framework for testing and UI implementation for C4GT",
-    languageCode: [],
-    systemDefault: "No",
-    versionKey: "1749056045354",
-    code: "vidya-framework",
-    objectType: "Framework",
-    status: "Live",
-    type: "K-12",
-    categories: [
-      {
-        identifier: "vidya-framework_board",
-        code: "board",
-        terms: [
-          {
-            associations: [
-              {
-                name: "English",
-                identifier: "vidya-framework_subject_english",
-                description: "English Subject",
-                code: "english",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Sanskrit",
-                identifier: "vidya-framework_subject_sanskrit",
-                description: "Sanskrit Subject",
-                code: "sanskrit",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Hindi",
-                identifier: "vidya-framework_medium_hindi",
-                description: "Hindi Medium",
-                code: "hindi",
-                status: "Live",
-                category: "medium",
-                index: 1
-              },
-              {
-                name: "English",
-                identifier: "vidya-framework_medium_english",
-                description: "English Medium",
-                code: "english",
-                status: "Live",
-                category: "medium",
-                index: 1
-              },
-              {
-                name: "Hindi",
-                identifier: "vidya-framework_subject_hindi",
-                description: "Hindi Subject",
-                code: "hindi",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Science",
-                identifier: "vidya-framework_subject_science",
-                description: "Science Subject",
-                code: "science",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Mathematics",
-                identifier: "vidya-framework_subject_mathematics",
-                description: "Mathematics Subject",
-                code: "mathematics",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Social Science",
-                identifier: "vidya-framework_subject_socialscience",
-                description: "Social Science Subject",
-                code: "socialscience",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Class 10",
-                identifier: "vidya-framework_gradelevel_class10",
-                description: "Class10 Grade",
-                code: "class10",
-                status: "Live",
-                category: "gradeLevel",
-                index: 1
-              },
-              {
-                name: "Bengali",
-                identifier: "vidya-framework_subject_bengali",
-                description: "Bengali Subject",
-                code: "bengali",
-                status: "Live",
-                category: "subject",
-                index: 1
-              }
-            ],
-            identifier: "vidya-framework_board_cbse",
-            code: "cbse",
-            name: "CBSE",
-            description: "CBSE Board Test",
-            index: 1,
-            category: "board",
-            status: "Live"
-          }
-        ],
-        name: "Board",
-        description: "Board category",
-        index: 1,
-        status: "Live"
-      },
-      {
-        identifier: "vidya-framework_medium",
-        code: "medium",
-        terms: [
-          {
-            associations: [
-              {
-                name: "Class 10",
-                identifier: "vidya-framework_gradelevel_class10",
-                description: "Class10 Grade",
-                code: "class10",
-                status: "Live",
-                category: "gradeLevel",
-                index: 1
-              },
-              {
-                name: "Mathematics",
-                identifier: "vidya-framework_subject_mathematics",
-                description: "Mathematics Subject",
-                code: "mathematics",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Science",
-                identifier: "vidya-framework_subject_science",
-                description: "Science Subject",
-                code: "science",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "English",
-                identifier: "vidya-framework_subject_english",
-                description: "English Subject",
-                code: "english",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Sanskrit",
-                identifier: "vidya-framework_subject_sanskrit",
-                description: "Sanskrit Subject",
-                code: "sanskrit",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Social Science",
-                identifier: "vidya-framework_subject_socialscience",
-                description: "Social Science Subject",
-                code: "socialscience",
-                status: "Live",
-                category: "subject",
-                index: 1
-              }
-            ],
-            identifier: "vidya-framework_medium_english",
-            code: "english",
-            name: "English",
-            description: "English Medium",
-            index: 1,
-            category: "medium",
-            status: "Live"
-          },
-          {
-            associations: [
-              {
-                name: "Class 10",
-                identifier: "vidya-framework_gradelevel_class10",
-                description: "Class10 Grade",
-                code: "class10",
-                status: "Live",
-                category: "gradeLevel",
-                index: 1
-              },
-              {
-                name: "Mathematics",
-                identifier: "vidya-framework_subject_mathematics",
-                description: "Mathematics Subject",
-                code: "mathematics",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Bengali",
-                identifier: "vidya-framework_subject_bengali",
-                description: "Bengali Subject",
-                code: "bengali",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Hindi",
-                identifier: "vidya-framework_subject_hindi",
-                description: "Hindi Subject",
-                code: "hindi",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Social Science",
-                identifier: "vidya-framework_subject_socialscience",
-                description: "Social Science Subject",
-                code: "socialscience",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Science",
-                identifier: "vidya-framework_subject_science",
-                description: "Science Subject",
-                code: "science",
-                status: "Live",
-                category: "subject",
-                index: 1
-              }
-            ],
-            identifier: "vidya-framework_medium_hindi",
-            code: "hindi",
-            name: "Hindi",
-            description: "Hindi Medium",
-            index: 1,
-            category: "medium",
-            status: "Live"
-          }
-        ],
-        name: "Medium",
-        description: "Medium",
-        index: 2,
-        status: "Live"
-      },
-      {
-        identifier: "vidya-framework_gradelevel",
-        code: "gradeLevel",
-        terms: [
-          {
-            associations: [
-              {
-                name: "English",
-                identifier: "vidya-framework_subject_english",
-                description: "English Subject",
-                code: "english",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Sanskrit",
-                identifier: "vidya-framework_subject_sanskrit",
-                description: "Sanskrit Subject",
-                code: "sanskrit",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Science",
-                identifier: "vidya-framework_subject_science",
-                description: "Science Subject",
-                code: "science",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Bengali",
-                identifier: "vidya-framework_subject_bengali",
-                description: "Bengali Subject",
-                code: "bengali",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Mathematics",
-                identifier: "vidya-framework_subject_mathematics",
-                description: "Mathematics Subject",
-                code: "mathematics",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Social Science",
-                identifier: "vidya-framework_subject_socialscience",
-                description: "Social Science Subject",
-                code: "socialscience",
-                status: "Live",
-                category: "subject",
-                index: 1
-              },
-              {
-                name: "Hindi",
-                identifier: "vidya-framework_subject_hindi",
-                description: "Hindi Subject",
-                code: "hindi",
-                status: "Live",
-                category: "subject",
-                index: 1
-              }
-            ],
-            identifier: "vidya-framework_gradelevel_class10",
-            code: "class10",
-            name: "Class 10",
-            description: "Class10 Grade",
-            index: 1,
-            category: "gradeLevel",
-            status: "Live"
-          }
-        ],
-        name: "Grade",
-        description: "Grade",
-        index: 3,
-        status: "Live"
-      },
-      {
-        identifier: "vidya-framework_subject",
-        code: "subject",
-        terms: [
-          {
-            identifier: "vidya-framework_subject_bengali",
-            code: "bengali",
-            name: "Bengali",
-            description: "Bengali Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_science",
-            code: "science",
-            name: "Science",
-            description: "Science Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_english",
-            code: "english",
-            name: "English",
-            description: "English Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_mathematics",
-            code: "mathematics",
-            name: "Mathematics",
-            description: "Mathematics Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_sanskrit",
-            code: "sanskrit",
-            name: "Sanskrit",
-            description: "Sanskrit Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_hindi",
-            code: "hindi",
-            name: "Hindi",
-            description: "Hindi Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          },
-          {
-            identifier: "vidya-framework_subject_socialscience",
-            code: "socialscience",
-            name: "Social Science",
-            description: "Social Science Subject",
-            index: 1,
-            category: "subject",
-            status: "Live"
-          }
-        ],
-        name: "Subject",
-        description: "Subject",
-        index: 4,
-        status: "Live"
-      }
-    ]
-  };
-
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
   return date.toLocaleString();
 };
 
 const FrameworkDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [framework, setFramework] = useState<Framework | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log(id);
+    if (!id) {
+      setError('No framework specified in URL');
+      setLoading(false);
+      return;
+    }
+    const fetchFramework = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("tenantId", import.meta.env.VITE_TENANT_ID);
+        myHeaders.append("Authorization", `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`);
+        myHeaders.append("Cookie", import.meta.env.VITE_COOKIE);
+
+        const requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow" as RequestRedirect,
+        };
+
+        const url = `${import.meta.env.VITE_INTERFACE_URL}/api/framework/v1/read/${id}`;
+        const response = await fetch(url, requestOptions);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const data = await response.json();
+        // debug
+        console.log(data.result.framework);
+        setFramework(data.result.framework); // adjust if the structure is different
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch framework");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFramework();
+  }, [id]);
+
+  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
+  if (!framework) return <div className="text-center py-8">No framework data available.</div>;
+
   const liveCategories = framework.categories.filter((cat) => cat.status === 'Live');
 
   // Calculate summary counts
