@@ -19,6 +19,7 @@ interface FrameworkItemProps {
   categories: number;
   status: 'draft' | 'published';
   updatedAt: Date;
+  channel: string;
 }
 
 const FrameworkItem: React.FC<FrameworkItemProps> = ({ 
@@ -27,7 +28,8 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
   code, 
   categories, 
   status, 
-  updatedAt 
+  updatedAt, 
+  channel 
 }) => {
   return (
     <div className="p-4 border-b border-border last:border-0">
@@ -43,7 +45,7 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Code: {code} • {categories} categories • Last updated: {formatDate(updatedAt)}
+          Channel: {channel} • {categories} categories • Last updated: {formatDate(updatedAt)}
           </p>
         </div>
         <div className="flex items-center mt-3 sm:mt-0">
@@ -134,7 +136,7 @@ const FrameworksList: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Frameworks</h1>
           <p className="text-muted-foreground">
-            Manage and create educational frameworks
+            Manage and create frameworks
           </p>
         </div>
         <Button
@@ -209,6 +211,7 @@ const FrameworksList: React.FC = () => {
                 categories={framework.categories ? framework.categories.length : 0}
                 status={framework.status && framework.status.toLowerCase() === 'live' ? 'published' : 'draft'}
                 updatedAt={framework.lastUpdatedOn ? new Date(framework.lastUpdatedOn) : new Date()}
+                channel={framework.channel}
               />
             ) : null
           ))
