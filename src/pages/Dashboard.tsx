@@ -17,27 +17,15 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ReactNode;
-  trend?: {
-    value: string;
-    positive: boolean;
-  };
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend }) => (
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => (
   <Card className="animate-fade-in">
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <h4 className="text-2xl font-bold mt-1">{value}</h4>
-          {trend && (
-            <div className="flex items-center mt-1">
-              <span className={trend.positive ? 'text-green-600' : 'text-red-600'}>
-                {trend.positive ? '↑' : '↓'} {trend.value}
-              </span>
-              <span className="text-xs text-muted-foreground ml-1">vs last month</span>
-            </div>
-          )}
         </div>
         <div className="bg-primary/10 p-3 rounded-full">
           {icon}
@@ -119,25 +107,21 @@ const Dashboard: React.FC = () => {
           title="Total Frameworks"
           value={frameworks.length.toString()}
           icon={<Layers className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "12.5%", positive: true }}
         />
         <StatCard
           title="Master Categories"
           value="12"
           icon={<Layers className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "3.1%", positive: true }}
         />
         <StatCard
           title="Total Categories"
           value="48"
           icon={<FileText className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "8.2%", positive: true }}
         />
         <StatCard
           title="Terms"
           value="320"
           icon={<FileText className="h-5 w-5 text-indigo-600" />}
-          trend={{ value: "5.6%", positive: true }}
         />
       </div>
 

@@ -70,7 +70,8 @@ const NavItem: React.FC<NavItemProps> = ({
 const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
-    frameworks: true
+    frameworks: true,
+    channels: true
   });
 
   const toggleMenu = (menu: string) => {
@@ -131,10 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
               active={location.pathname.includes('/frameworks')} 
               hasChildren={true}
               isOpen={openMenus.frameworks}
-              onClick={(e) => {
-                e.preventDefault();
-                toggleMenu('frameworks');
-              }}
+              onClick={() => toggleMenu('frameworks')}
             >
               <Link 
                 to="/frameworks" 
@@ -159,6 +157,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, setIsMobileOpen }) => {
                 onClick={closeMobileMenu}
               >
                 Create New Framework
+              </Link>
+            </NavItem>
+
+            {/* Channels menu */}
+            <NavItem 
+              to="/channels" 
+              icon={<Layers size={18} />} 
+              label="Channels"
+              active={location.pathname.includes('/channels')} 
+              hasChildren={true}
+              isOpen={openMenus.channels}
+              onClick={() => toggleMenu('channels')}
+            >
+              <Link 
+                to="/channels" 
+                className={cn(
+                  "block py-2 text-sm font-medium rounded-md",
+                  location.pathname === '/channels' 
+                    ? "text-indigo-700" 
+                    : "text-slate-600 hover:text-slate-900"
+                )}
+                onClick={closeMobileMenu}
+              >
+                View All Channels
+              </Link>
+              <Link 
+                to="/channels/create" 
+                className={cn(
+                  "block py-2 text-sm font-medium rounded-md",
+                  location.pathname === '/channels/create' 
+                    ? "text-indigo-700" 
+                    : "text-slate-600 hover:text-slate-900"
+                )}
+                onClick={closeMobileMenu}
+              >
+                Create New Channel
               </Link>
             </NavItem>
           </ul>

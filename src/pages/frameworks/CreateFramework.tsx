@@ -9,12 +9,10 @@ import {
   ListTree, 
   Edit3, 
   Eye,
-  Send,
-  Radio
+  Send
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
-import StepChannel from './steps/StepChannel';
 import StepFramework from './steps/StepFramework';
 import StepCategories from './steps/StepCategories';
 import StepTerms from './steps/StepTerms';
@@ -26,47 +24,43 @@ import { useNavigate } from 'react-router-dom';
 import { useFrameworkFormStore } from '../../store/frameworkFormStore';
 
 const steps = [
-  { number: 1, title: 'Channel', icon: <Radio size={16} /> },
-  { number: 2, title: 'Framework', icon: <FileCheck size={16} /> },
-  { number: 3, title: 'Categories', icon: <ListPlus size={16} /> },
-  { number: 4, title: 'Terms', icon: <ListTree size={16} /> },
-  { number: 5, title: 'Associations', icon: <Edit3 size={16} /> },
-  { number: 6, title: 'Review', icon: <Eye size={16} /> },
-  { number: 7, title: 'Publish', icon: <Send size={16} /> }
+  { number: 1, title: 'Framework', icon: <FileCheck size={16} /> },
+  { number: 2, title: 'Categories', icon: <ListPlus size={16} /> },
+  { number: 3, title: 'Terms', icon: <ListTree size={16} /> },
+  { number: 4, title: 'Associations', icon: <Edit3 size={16} /> },
+  { number: 5, title: 'Review', icon: <Eye size={16} /> },
+  { number: 6, title: 'Publish', icon: <Send size={16} /> }
 ];
 
 const CreateFramework: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { channel, framework, categories, step, setStep, reset } = useFrameworkFormStore();
+  const { framework, categories, step, setStep, reset } = useFrameworkFormStore();
 
   const handleNext = async () => {
     setIsLoading(true);
     try {
       switch (step) {
         case 1:
-          await simulateApiCall('/channel/v1/create', 'POST', { request: { channel } });
-          break;
-        case 2:
           await simulateApiCall('/framework/v1/create', 'POST', { request: { framework } });
           break;
-        case 3:
+        case 2:
           if (categories.length > 0) {
             for (const category of categories) {
               await simulateApiCall('/framework/v1/category/create', 'POST', { request: { category } });
             }
           }
           break;
-        case 4:
+        case 3:
           // Term creation would happen here
           break;
-        case 5:
+        case 4:
           // Associations would be updated here
           break;
-        case 6:
+        case 5:
           // Nothing to submit on review step
           break;
-        case 7:
+        case 6:
           await simulateApiCall('/framework/v1/publish', 'POST', {});
           navigate('/frameworks');
           return;
@@ -134,13 +128,12 @@ const CreateFramework: React.FC = () => {
         </CardHeader>
         
         <CardContent>
-          {step === 1 && <StepChannel />}
-          {step === 2 && <StepFramework />}
-          {step === 3 && <StepCategories />}
-          {step === 4 && <StepTerms />}
-          {step === 5 && <StepAssociations />}
-          {step === 6 && <StepReview />}
-          {step === 7 && <StepPublish />}
+          {step === 1 && <StepFramework />}
+          {step === 2 && <StepCategories />}
+          {step === 3 && <StepTerms />}
+          {step === 4 && <StepAssociations />}
+          {step === 5 && <StepReview />}
+          {step === 6 && <StepPublish />}
         </CardContent>
         
         <CardFooter className="flex justify-between border-t border-border pt-4">
