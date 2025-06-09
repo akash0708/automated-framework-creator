@@ -50,9 +50,14 @@ export const useFrameworksStore = create<FrameworksState>((set) => ({
       const response = await fetch(url, requestOptions);
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
-      set({ frameworks: data.result.Framework || [], loading: false });
+      if (!data || !data.result || !Array.isArray(data.result.Framework)) {
+        set({ frameworks: [], loading: false, error: 'Malformed API response' });
+        return;
+      }
+      set({ frameworks: data.result.Framework, loading: false });
     } catch (err: any) {
-      set({ error: err.message || "Failed to fetch frameworks", loading: false });
+      console.error('Frameworks fetch error:', err);
+      set({ error: err?.message || "Failed to fetch frameworks", loading: false, frameworks: [] });
     }
   },
 })); 

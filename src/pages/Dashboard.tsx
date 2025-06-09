@@ -52,11 +52,20 @@ const RecentActivityItem: React.FC<{
   time: string;
   status: string;
   user: string;
-}> = ({ title, time, status, user }) => (
+  id?: string;
+}> = ({ title, time, status, user, id }) => (
   <div className="py-3 border-b border-border last:border-0">
     <div className="flex justify-between items-start">
       <div>
-        <p className="font-medium">{title}</p>
+        <p className="font-medium">
+          {id ? (
+            <Link to={`/frameworks/${id}`} className="hover:underline text-black">
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
+        </p>
         <p className="text-sm text-muted-foreground mt-1">
           {user} • {time}
         </p>
@@ -149,6 +158,7 @@ const Dashboard: React.FC = () => {
                 {recentFrameworks.map((fw) => (
                   <RecentActivityItem
                     key={fw.identifier}
+                    id={fw.identifier}
                     title={fw.name}
                     time={fw.lastUpdatedOn ? new Date(fw.lastUpdatedOn).toLocaleString() : 'Unknown'}
                     status={fw.status && fw.status.toLowerCase() === 'live' ? 'Published' : 'Draft'}

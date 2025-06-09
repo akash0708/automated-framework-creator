@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowUpRight, 
@@ -47,25 +47,25 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
           </p>
         </div>
         <div className="flex items-center mt-3 sm:mt-0">
-          <Button
-            variant="outline"
-            size="sm"
-            className="mr-2"
-            rightIcon={<ArrowUpRight size={14} />}
-          >
-            <Link to={`/frameworks/${id}`}>
+          <Link to={`/frameworks/${id}`} className="mr-2">
+            <Button
+              variant="outline"
+              size="sm"
+              rightIcon={<ArrowUpRight size={14} />}
+              className="w-full"
+            >
               View
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mr-2"
-          >
-            <Link to={`/frameworks/${id}/edit`}>
+            </Button>
+          </Link>
+          <Link to={`/frameworks/${id}/edit`} className="mr-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
               Edit
-            </Link>  
-          </Button>
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
@@ -75,30 +75,58 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
 const FrameworksList: React.FC = () => {
   const { frameworks, loading, error, fetchFrameworks } = useFrameworksStore();
   const [search, setSearch] = useState('');
-  const [channelFilter, setChannelFilter] = useState('');
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (frameworks.length === 0 && !loading && !error) {
+    if ((!frameworks || frameworks.length === 0) && !loading && !error) {
       fetchFrameworks();
     }
     // eslint-disable-next-line
   }, []);
 
-  // Get unique channel values for filter dropdown
-  const channels = Array.from(new Set(frameworks.map((fw: any) => fw.channel).filter(Boolean)));
+  // Close filter popup on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setFilterOpen(false);
+      }
+    }
+    if (filterOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterOpen]);
 
-  // Filter frameworks by search query (name or code) and channel
-  const filteredFrameworks = frameworks.filter((framework: any) => {
+  // Get unique channel values for filter
+  const channels = Array.from(new Set((frameworks || []).map((fw: any) => fw?.channel).filter(Boolean)));
+
+  // Filter frameworks by search query (name or code) and selected channels
+  const filteredFrameworks = (frameworks || []).filter((framework: any) => {
+    if (!framework) return false;
     const q = search.trim().toLowerCase();
     const matchesSearch =
-      framework.name?.toLowerCase().includes(q) ||
-      framework.code?.toLowerCase().includes(q);
-    const matchesChannel = channelFilter ? framework.channel === channelFilter : true;
+      (framework.name?.toLowerCase().includes(q) ||
+      framework.code?.toLowerCase().includes(q));
+    const matchesChannel =
+      selectedChannels.length === 0 || selectedChannels.includes(framework.channel);
     return matchesSearch && matchesChannel;
   });
 
+  const handleChannelChange = (channel: string) => {
+    setSelectedChannels((prev) =>
+      prev.includes(channel)
+        ? prev.filter((ch) => ch !== channel)
+        : [...prev, channel]
+    );
+  };
+
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
+  if (!frameworks) return <div className="text-center py-8">No frameworks data available.</div>;
 
   return (
     <div className="space-y-6">
@@ -118,7 +146,7 @@ const FrameworksList: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center">
+      <div className="flex flex-col md:flex-row gap-4 items-center relative">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search className="h-4 w-4 text-slate-400" />
@@ -132,25 +160,39 @@ const FrameworksList: React.FC = () => {
             autoFocus
           />
         </div>
-        <div>
-          <select
-            className="py-2 px-3 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            value={channelFilter}
-            onChange={e => setChannelFilter(e.target.value)}
+        <div ref={filterRef} className="relative">
+          <Button
+            variant="outline"
+            leftIcon={<Filter size={16} />}
+            onClick={() => setFilterOpen((open) => !open)}
+            aria-expanded={filterOpen}
+            aria-haspopup="true"
           >
-            <option value="">All Channels</option>
-            {channels.map((ch) => (
-              <option key={ch} value={ch}>{ch}</option>
-            ))}
-          </select>
+            Filter
+          </Button>
+          {filterOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-10 p-4 animate-fade-in">
+              <div className="mb-2 font-semibold text-base">Filter by Channel</div>
+              {channels.length === 0 ? (
+                <div className="text-muted-foreground text-sm">No channels available</div>
+              ) : (
+                <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
+                  {channels.map((ch) => (
+                    <label key={ch} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedChannels.includes(ch)}
+                        onChange={() => handleChannelChange(ch)}
+                        className="accent-indigo-600"
+                      />
+                      <span className="text-sm">{ch}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <Button
-          variant="outline"
-          leftIcon={<Filter size={16} />}
-          disabled
-        >
-          Filter
-        </Button>
       </div>
 
       <Card className="animate-fade-in">
@@ -158,15 +200,17 @@ const FrameworksList: React.FC = () => {
           <div className="p-6 text-center text-muted-foreground">No frameworks found.</div>
         ) : (
           filteredFrameworks.map((framework: any) => (
-            <FrameworkItem
-              key={framework.identifier}
-              id={framework.identifier}
-              name={framework.name}
-              code={framework.code}
-              categories={framework.categories ? framework.categories.length : 0}
-              status={framework.status && framework.status.toLowerCase() === 'live' ? 'published' : 'draft'}
-              updatedAt={framework.lastUpdatedOn ? new Date(framework.lastUpdatedOn) : new Date()}
-            />
+            framework ? (
+              <FrameworkItem
+                key={framework.identifier}
+                id={framework.identifier}
+                name={framework.name}
+                code={framework.code}
+                categories={framework.categories ? framework.categories.length : 0}
+                status={framework.status && framework.status.toLowerCase() === 'live' ? 'published' : 'draft'}
+                updatedAt={framework.lastUpdatedOn ? new Date(framework.lastUpdatedOn) : new Date()}
+              />
+            ) : null
           ))
         )}
       </Card>

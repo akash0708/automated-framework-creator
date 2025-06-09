@@ -105,18 +105,19 @@ const FrameworkDetails: React.FC = () => {
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
-  if (!framework) return <div className="text-center py-8">No framework data available.</div>;
+  if (!framework || typeof framework !== 'object') return <div className="text-center py-8">No framework data available.</div>;
 
-  const liveCategories = framework.categories.filter((cat) => cat.status === 'Live');
+  const liveCategories = Array.isArray(framework.categories)
+    ? framework.categories.filter((cat) => cat && cat.status === 'Live')
+    : [];
 
-  // Calculate summary counts
-  const getCategoryCount = (code: string) =>
-    liveCategories.find((cat) => cat.code.toLowerCase() === code.toLowerCase())?.terms?.filter(term => term.status === 'Live').length || 0;
-
-  const totalBoards = getCategoryCount('board');
-  const totalMediums = getCategoryCount('medium');
-  const totalGrades = getCategoryCount('gradelevel');
-  const totalSubjects = getCategoryCount('subject');
+  // Calculate summary for all live categories
+  const overviewItems = liveCategories.map((cat) => ({
+    name: cat?.name || 'Unnamed Category',
+    count: Array.isArray(cat?.terms)
+      ? cat.terms.filter(term => term && term.status === 'Live').length
+      : 0
+  }));
 
   return (
     <div className="max-w-6xl mx-auto py-8">
@@ -143,22 +144,12 @@ const FrameworkDetails: React.FC = () => {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-2">Overview</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="rounded-xl border bg-white p-6 flex flex-col items-center shadow-sm">
-            <span className="text-base text-muted-foreground mb-1">Total Boards</span>
-            <span className="text-2xl font-bold">{totalBoards}</span>
-          </div>
-          <div className="rounded-xl border bg-white p-6 flex flex-col items-center shadow-sm">
-            <span className="text-base text-muted-foreground mb-1">Total Mediums</span>
-            <span className="text-2xl font-bold">{totalMediums}</span>
-          </div>
-          <div className="rounded-xl border bg-white p-6 flex flex-col items-center shadow-sm">
-            <span className="text-base text-muted-foreground mb-1">Total Grades</span>
-            <span className="text-2xl font-bold">{totalGrades}</span>
-          </div>
-          <div className="rounded-xl border bg-white p-6 flex flex-col items-center shadow-sm">
-            <span className="text-base text-muted-foreground mb-1">Total Subjects</span>
-            <span className="text-2xl font-bold">{totalSubjects}</span>
-          </div>
+          {overviewItems.map((item) => (
+            <div key={item.name} className="rounded-xl border bg-white p-6 flex flex-col items-center shadow-sm">
+              <span className="text-base text-muted-foreground mb-1">{item.name}</span>
+              <span className="text-2xl font-bold">{item.count}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -168,70 +159,75 @@ const FrameworkDetails: React.FC = () => {
       {liveCategories.length > 0 ? (
         <div className="space-y-6">
           {liveCategories.map((category) => (
-            <Card key={category.identifier} className="shadow-md">
-              <CardHeader className="bg-slate-50 border-b">
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-xl font-semibold">{category.name}</h2>
-                  {category.description && (
-                    <p className="text-base text-muted-foreground">{category.description}</p>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="px-3 py-2 text-left font-semibold text-base">Terms</th>
-                        <th className="px-3 py-2 text-left font-semibold text-base">Code</th>
-                        <th className="px-3 py-2 text-left font-semibold text-base">Description</th>
-                        <th className="px-3 py-2 text-left font-semibold text-base">Associations</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(category.terms || []).filter((term) => term.status === 'Live').length > 0 ? (
-                        (category.terms || [])
-                          .filter((term) => term.status === 'Live')
-                          .map((term) => (
-                            <tr key={term.identifier} className="border-b last:border-0 hover:bg-slate-50">
-                              <td className="px-3 py-2 font-medium text-base">{term.name}</td>
-                              <td className="px-3 py-2 text-base">{term.code}</td>
-                              <td className="px-3 py-2 text-base">{term.description}</td>
-                              <td className="px-3 py-2 text-base">
-                                {term.associations && term.associations.length > 0 ? (
-                                  (() => {
-                                    const liveAssocs = term.associations.filter((assoc) => assoc.status === 'Live');
-                                    if (liveAssocs.length === 0) return <span className="text-muted-foreground">No associations</span>;
-                                    // Group associations by category and map to the new component's expected format
-                                    const grouped: { [cat: string]: Association[] } = {};
-                                    liveAssocs.forEach((assoc) => {
-                                      if (!grouped[assoc.category]) grouped[assoc.category] = [];
-                                      grouped[assoc.category].push(assoc);
-                                    });
-                                    // Convert to array of { name, identifier, terms: [{identifier, name}] }
-                                    const categories = Object.entries(grouped).map(([cat, assocs]) => ({
-                                      name: cat.charAt(0).toUpperCase() + cat.slice(1),
-                                      identifier: cat,
-                                      terms: assocs.map(a => ({ identifier: a.identifier, name: a.name }))
-                                    }));
-                                    return <AssociationCategories categories={categories} termName={term.name} categoryName={category.name} />;
-                                  })()
-                                ) : (
-                                  <span className="text-muted-foreground">No associations</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))
-                      ) : (
-                        <tr>
-                          <td colSpan={4} className="text-center text-muted-foreground py-4 text-base">No terms available</td>
+            category ? (
+              <Card key={category.identifier || category.name || Math.random()} className="shadow-md">
+                <CardHeader className="bg-slate-50 border-b">
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-xl font-semibold">{category.name || 'Unnamed Category'}</h2>
+                    {category.description && (
+                      <p className="text-base text-muted-foreground">{category.description}</p>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border text-sm">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          <th className="px-3 py-2 text-left font-semibold text-base">Terms</th>
+                          <th className="px-3 py-2 text-left font-semibold text-base">Code</th>
+                          <th className="px-3 py-2 text-left font-semibold text-base">Description</th>
+                          <th className="px-3 py-2 text-left font-semibold text-base">Associations</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                      </thead>
+                      <tbody>
+                        {Array.isArray(category.terms) && category.terms.filter((term) => term && term.status === 'Live').length > 0 ? (
+                          category.terms
+                            .filter((term) => term && term.status === 'Live')
+                            .map((term) => (
+                              term ? (
+                                <tr key={term.identifier || term.name || Math.random()} className="border-b last:border-0 hover:bg-slate-50">
+                                  <td className="px-3 py-2 font-medium text-base">{term.name || 'Unnamed Term'}</td>
+                                  <td className="px-3 py-2 text-base">{term.code || '-'}</td>
+                                  <td className="px-3 py-2 text-base">{term.description || '-'}</td>
+                                  <td className="px-3 py-2 text-base">
+                                    {Array.isArray(term.associations) && term.associations.length > 0 ? (
+                                      (() => {
+                                        const liveAssocs = term.associations.filter((assoc) => assoc && assoc.status === 'Live');
+                                        if (liveAssocs.length === 0) return <span className="text-muted-foreground">No associations</span>;
+                                        // Group associations by category and map to the new component's expected format
+                                        const grouped: { [cat: string]: Association[] } = {};
+                                        liveAssocs.forEach((assoc) => {
+                                          if (!assoc || !assoc.category) return;
+                                          if (!grouped[assoc.category]) grouped[assoc.category] = [];
+                                          grouped[assoc.category].push(assoc);
+                                        });
+                                        // Convert to array of { name, identifier, terms: [{identifier, name}] }
+                                        const categories = Object.entries(grouped).map(([cat, assocs]) => ({
+                                          name: cat.charAt(0).toUpperCase() + cat.slice(1),
+                                          identifier: cat,
+                                          terms: assocs.map(a => ({ identifier: a.identifier, name: a.name }))
+                                        }));
+                                        return <AssociationCategories categories={categories} termName={term.name} categoryName={category.name} />;
+                                      })()
+                                    ) : (
+                                      <span className="text-muted-foreground">No associations</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              ) : null
+                            ))
+                        ) : (
+                          <tr>
+                            <td colSpan={4} className="text-center text-muted-foreground py-4 text-base">No terms available</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null
           ))}
         </div>
       ) : (
