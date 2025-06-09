@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Layers, 
   Users, 
@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import { useFrameworksStore } from '../store/frameworksStore';
 
 interface StatCardProps {
   title: string;
@@ -70,6 +71,25 @@ const RecentActivityItem: React.FC<{
 );
 
 const Dashboard: React.FC = () => {
+  const { frameworks, loading, error, fetchFrameworks } = useFrameworksStore();
+
+  useEffect(() => {
+    if (frameworks.length === 0 && !loading && !error) {
+      fetchFrameworks();
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Sort frameworks by lastUpdatedOn (descending)
+  const sortedFrameworks = [...frameworks].sort((a, b) => {
+    const dateA = a.lastUpdatedOn ? new Date(a.lastUpdatedOn).getTime() : 0;
+    const dateB = b.lastUpdatedOn ? new Date(b.lastUpdatedOn).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  // Show up to 5 most recent
+  const recentFrameworks = sortedFrameworks.slice(0, 5);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -88,7 +108,7 @@ const Dashboard: React.FC = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Frameworks"
-          value="15"
+          value={frameworks.length.toString()}
           icon={<Layers className="h-5 w-5 text-indigo-600" />}
           trend={{ value: "12.5%", positive: true }}
         />
@@ -118,38 +138,25 @@ const Dashboard: React.FC = () => {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-0">
-              <RecentActivityItem
-                title="Mathematics Framework"
-                time="2 hours ago"
-                status="Published"
-                user="Admin User"
-              />
-              <RecentActivityItem
-                title="Science Framework"
-                time="5 hours ago"
-                status="Draft"
-                user="Content Manager"
-              />
-              <RecentActivityItem
-                title="Language Framework"
-                time="Yesterday"
-                status="Published"
-                user="Admin User"
-              />
-              <RecentActivityItem
-                title="Social Studies Framework"
-                time="2 days ago"
-                status="Published"
-                user="Content Manager"
-              />
-              <RecentActivityItem
-                title="Computer Science Framework"
-                time="3 days ago"
-                status="Draft"
-                user="Admin User"
-              />
-            </div>
+            {loading ? (
+              <div className="text-center py-4">Loading...</div>
+            ) : error ? (
+              <div className="text-center text-red-500 py-4">{error}</div>
+            ) : recentFrameworks.length === 0 ? (
+              <div className="text-center text-muted-foreground py-4">No recent activity.</div>
+            ) : (
+              <div className="space-y-0">
+                {recentFrameworks.map((fw) => (
+                  <RecentActivityItem
+                    key={fw.identifier}
+                    title={fw.name}
+                    time={fw.lastUpdatedOn ? new Date(fw.lastUpdatedOn).toLocaleString() : 'Unknown'}
+                    status={fw.status && fw.status.toLowerCase() === 'live' ? 'Published' : 'Draft'}
+                    user={fw.channel || 'Unknown'}
+                  />
+                ))}
+              </div>
+            )}
             <Button 
               className="w-full mt-4" 
               variant="outline"
