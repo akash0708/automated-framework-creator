@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import slugify from 'slugify';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,3 +38,8 @@ export const simulateApiCall = async (
     data: data || { id: generateUniqueId() },
   };
 };
+
+// Utility to generate a slug from a string (for codes)
+export function slugifyString(input: string): string {
+  return slugify(input, { lower: true, strict: true });
+}

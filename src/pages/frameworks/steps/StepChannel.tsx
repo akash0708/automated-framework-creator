@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
-import Input from '../../../components/ui/Input';
 
 interface Channel {
   identifier: string;

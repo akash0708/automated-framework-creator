@@ -37,7 +37,7 @@ const steps = [
 const CreateFramework: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { framework, categories, step, setStep, reset } = useFrameworkFormStore();
+  const { framework, categories, step, setStep, reset, channel } = useFrameworkFormStore();
 
   const handleNext = async () => {
     setIsLoading(true);
@@ -155,6 +155,7 @@ const CreateFramework: React.FC = () => {
             onClick={handleNext}
             isLoading={isLoading}
             rightIcon={step < steps.length ? <ArrowRight size={16} /> : undefined}
+            disabled={(step === 1 && !channel?.code) || isLoading}
           >
             {step < steps.length ? 'Continue' : 'Publish Framework'}
           </Button>

@@ -24,7 +24,7 @@ type FrameworkFormStore = FrameworkFormData & {
   updateTermAssociations: (
     categoryIndex: number,
     termIndex: number,
-    associationsWith: Array<{ identifier: string }>
+    associationsWith: Array<{ code: string; category: string; associatedTermIdentifier: string }>
   ) => void;
   reset: () => void;
 };
@@ -47,14 +47,14 @@ export const useFrameworkFormStore = create<FrameworkFormStore>((set, get) => ({
       updatedCategories[categoryIndex].terms?.push(term);
       return { ...state, categories: updatedCategories };
     }),
-  updateTermAssociations: (categoryIndex: number, termIndex: number, associationsWith: Array<{ identifier: string }>) =>
+  updateTermAssociations: (categoryIndex: number, termIndex: number, associationsWith: Array<{ code: string; category: string; associatedTermIdentifier: string }>) =>
     set((state) => {
       const updatedCategories = [...state.categories];
       const terms = updatedCategories[categoryIndex].terms || [];
       if (terms[termIndex]) {
         terms[termIndex] = {
           ...terms[termIndex],
-          associationsWith: associationsWith.map((assoc) => assoc.identifier)
+          associationsWith: associationsWith
         };
       }
       return { ...state, categories: updatedCategories };

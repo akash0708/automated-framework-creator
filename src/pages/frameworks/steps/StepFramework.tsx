@@ -2,10 +2,17 @@ import React from 'react';
 import Input from '../../../components/ui/Input';
 import Textarea from '../../../components/ui/Textarea';
 import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
+import { slugifyString } from '../../../lib/utils';
 
 const StepFramework: React.FC = () => {
   const framework = useFrameworkFormStore((state) => state.framework);
   const setFramework = useFrameworkFormStore((state) => state.setFramework);
+
+  // Always auto-generate code from name as the user types, overriding manual edits
+  React.useEffect(() => {
+    setFramework({ code: slugifyString(framework.name || '') });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [framework.name]);
 
   return (
     <div className="space-y-6 animate-slide-in">
@@ -33,7 +40,7 @@ const StepFramework: React.FC = () => {
           value={framework.code}
           onChange={(e) => setFramework({ code: e.target.value })}
           placeholder="e.g., math_framework"
-          hint="Code must be unique and use underscores"
+          hint="Code must be unique and use underscores."
           required
         />
       </div>

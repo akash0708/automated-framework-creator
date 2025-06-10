@@ -24,12 +24,16 @@ export interface Category {
 }
 
 export interface Term {
-  id?: string;
+  identifier?: string;
   name: string;
   code: string;
   description?: string;
   categoryId?: string;
-  associationsWith?: string[];
+  associationsWith?: Array<{
+    code: string;
+    category: string;
+    associatedTermIdentifier: string;
+  }>;
 }
 
 export interface FrameworkFormData {

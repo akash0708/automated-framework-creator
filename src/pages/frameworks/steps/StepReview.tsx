@@ -68,18 +68,15 @@ const StepReview: React.FC = () => {
                             <p className="font-medium text-sm">{term.name}</p>
                             <p className="text-xs text-muted-foreground">Code: {term.code}</p>
                             {term.associationsWith && term.associationsWith.length > 0 && (
-                              <div className="mt-1">
-                                <p className="text-xs font-medium">Associations</p>
-                                <div className="flex flex-wrap gap-1 mt-1">
+                              <div className="mt-2">
+                                <span className="text-xs text-muted-foreground">Associations:</span>
+                                <ul className="list-disc ml-6">
                                   {term.associationsWith.map((assoc, aIndex) => (
-                                    <span 
-                                      key={aIndex}
-                                      className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
-                                    >
-                                      {assoc}
-                                    </span>
+                                    <li key={aIndex} className="text-xs">
+                                      {assoc.code} ({assoc.category}) → {assoc.associatedTermIdentifier}
+                                    </li>
                                   ))}
-                                </div>
+                                </ul>
                               </div>
                             )}
                           </div>

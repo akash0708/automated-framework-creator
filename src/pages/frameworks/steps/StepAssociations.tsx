@@ -10,7 +10,7 @@ const StepAssociations: React.FC = () => {
   const updateTermAssociations = useFrameworkFormStore((state) => state.updateTermAssociations);
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState<number | null>(null);
   const [selectedTermIndex, setSelectedTermIndex] = useState<number | null>(null);
-  const [selectedAssociations, setSelectedAssociations] = useState<Array<{ identifier: string }>>([]);
+  const [selectedAssociations, setSelectedAssociations] = useState<Array<{ code: string; category: string; associatedTermIdentifier: string }>>([]);
   const [selectedSourceCategoryIndex, setSelectedSourceCategoryIndex] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -30,7 +30,11 @@ const StepAssociations: React.FC = () => {
       const category = categories[selectedCategoryIndex];
       const term = category.terms?.[index];
       if (term && term.associationsWith) {
-        setSelectedAssociations(term.associationsWith.map(id => ({ identifier: id })));
+        setSelectedAssociations(term.associationsWith.map(assoc => ({
+          code: assoc.code,
+          category: assoc.category,
+          associatedTermIdentifier: assoc.associatedTermIdentifier
+        })));
       } else {
         setSelectedAssociations([]);
       }
@@ -41,13 +45,12 @@ const StepAssociations: React.FC = () => {
     setSelectedSourceCategoryIndex(categoryIndex);
   };
 
-  const handleAssociationToggle = (termId: string) => {
+  const handleAssociationToggle = (termId: string, code: string, category: string) => {
     setSelectedAssociations(prev => {
-      const identifier = { identifier: termId };
-      if (prev.some(assoc => assoc.identifier === termId)) {
-        return prev.filter(assoc => assoc.identifier !== termId);
+      if (prev.some(assoc => assoc.associatedTermIdentifier === termId)) {
+        return prev.filter(assoc => assoc.associatedTermIdentifier !== termId);
       } else {
-        return [...prev, identifier];
+        return [...prev, { code, category, associatedTermIdentifier: termId }];
       }
     });
   };
@@ -74,17 +77,18 @@ const StepAssociations: React.FC = () => {
   };
 
   const getOtherCategories = () => {
-    if (selectedCategoryIndex === null) return categories;
-    return categories.filter((_, index) => index !== selectedCategoryIndex);
+    if (selectedCategoryIndex === null) return categories.map((cat, idx) => ({ category: cat, index: idx }));
+    return categories
+      .map((cat, idx) => ({ category: cat, index: idx }))
+      .filter(({ index }) => index !== selectedCategoryIndex);
   };
 
   const selectedCategory = selectedCategoryIndex !== null ? categories[selectedCategoryIndex] : null;
   const selectedTerm = selectedCategory && selectedTermIndex !== null 
     ? selectedCategory.terms?.[selectedTermIndex] 
     : null;
-  const sourceCategory = selectedSourceCategoryIndex !== null 
-    ? categories[selectedSourceCategoryIndex] 
-    : null;
+  const sourceCategory =
+    selectedSourceCategoryIndex !== null ? categories[selectedSourceCategoryIndex] : null;
 
   return (
     <div className="space-y-6 animate-slide-in">
@@ -145,9 +149,9 @@ const StepAssociations: React.FC = () => {
             <CardContent className="p-4">
               <h4 className="font-medium mb-4">Available Categories</h4>
               <div className="space-y-2">
-                {getOtherCategories().map((category, index) => (
+                {getOtherCategories().map(({ category, index }) => (
                   <button
-                    key={index}
+                    key={category.code}
                     onClick={() => handleSourceCategorySelect(index)}
                     className={`w-full text-left p-2 rounded-md hover:bg-gray-50 ${
                       selectedSourceCategoryIndex === index ? 'bg-indigo-50 text-indigo-700' : ''
@@ -176,8 +180,8 @@ const StepAssociations: React.FC = () => {
                           type="checkbox"
                           id={`term-${index}`}
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                          checked={selectedAssociations.some(assoc => assoc.identifier === termIdentifier)}
-                          onChange={() => handleAssociationToggle(termIdentifier)}
+                          checked={selectedAssociations.some(assoc => assoc.associatedTermIdentifier === termIdentifier)}
+                          onChange={() => handleAssociationToggle(termIdentifier, term.code, sourceCategory.code)}
                           disabled={!selectedTerm}
                         />
                         <label htmlFor={`term-${index}`} className="ml-2 block text-sm text-gray-900">
@@ -207,16 +211,15 @@ const StepAssociations: React.FC = () => {
               <ChevronRight className="mx-2 h-4 w-4 text-gray-400" />
               <div className="flex flex-wrap gap-2">
                 {selectedAssociations.map((assoc, index) => {
-                  const [categoryCode, termCode] = assoc.identifier.split(':');
+                  const [categoryCode, termCode] = assoc.associatedTermIdentifier.split(':');
                   const category = categories.find(cat => cat.code === categoryCode);
                   const term = category?.terms?.find(t => t.code === termCode);
-                  
-                  return term ? (
+                  return term && category ? (
                     <span 
                       key={index}
                       className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
                     >
-                      {term.name}
+                      {term.name} <span className="ml-1 text-slate-500">({category.name})</span>
                     </span>
                   ) : null;
                 })}
