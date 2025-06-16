@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface Framework {
   identifier: string;
@@ -26,17 +26,20 @@ export const useFrameworksStore = create<FrameworksState>((set) => ({
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("tenantId", import.meta.env.VITE_TENANT_ID);
-      myHeaders.append("Authorization", `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`);
-      myHeaders.append("Cookie", import.meta.env.VITE_COOKIE);
+      myHeaders.append("tenantId", process.env.NEXT_PUBLIC_TENANT_ID);
+      myHeaders.append(
+        "Authorization",
+        `Bearer ${process.env.NEXT_PUBLIC_AUTH_TOKEN}`
+      );
+      myHeaders.append("Cookie", process.env.NEXT_PUBLIC_COOKIE);
 
       const raw = JSON.stringify({
         request: {
           filters: {
             status: ["Draft", "Live"],
-            objectType: "Framework"
-          }
-        }
+            objectType: "Framework",
+          },
+        },
       });
 
       const requestOptions = {
@@ -46,18 +49,26 @@ export const useFrameworksStore = create<FrameworksState>((set) => ({
         redirect: "follow" as RequestRedirect,
       };
 
-      const url = `${import.meta.env.VITE_INTERFACE_URL}/action/composite/v3/search`;
+      const url = `${process.env.NEXT_PUBLIC_INTERFACE_URL}/action/composite/v3/search`;
       const response = await fetch(url, requestOptions);
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
       if (!data || !data.result || !Array.isArray(data.result.Framework)) {
-        set({ frameworks: [], loading: false, error: 'Malformed API response' });
+        set({
+          frameworks: [],
+          loading: false,
+          error: "Malformed API response",
+        });
         return;
       }
       set({ frameworks: data.result.Framework, loading: false });
     } catch (err: any) {
-      console.error('Frameworks fetch error:', err);
-      set({ error: err?.message || "Failed to fetch frameworks", loading: false, frameworks: [] });
+      console.error("Frameworks fetch error:", err);
+      set({
+        error: err?.message || "Failed to fetch frameworks",
+        loading: false,
+        frameworks: [],
+      });
     }
   },
-})); 
+}));

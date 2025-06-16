@@ -1,9 +1,15 @@
+"use client";
+
 import React, { useState } from "react";
-import Input from "../../components/ui/Input";
+import { useRouter } from "next/navigation";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import { useFrameworkFormStore } from "../../store/frameworkFormStore";
-import Button from "../../components/ui/Button";
 import { PlusCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const CreateChannel: React.FC = () => {
   const channel = useFrameworkFormStore((state) => state.channel);
@@ -11,7 +17,7 @@ const CreateChannel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +56,7 @@ const CreateChannel: React.FC = () => {
       console.log("Channel created (simulated):", data.result.channel);
       setSuccess("Channel created successfully!");
       setChannel({ name: "", code: "" });
-      setTimeout(() => navigate("/channels"), 1000);
+      setTimeout(() => router.push("/channels"), 1000);
     } catch (err: any) {
       setError(err.message || "Failed to create channel");
     } finally {

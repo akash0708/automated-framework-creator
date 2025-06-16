@@ -1,35 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ArrowUpRight, 
-  Plus, 
-  Search, 
-  Filter 
-} from 'lucide-react';
-import Button from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import Badge from '../../components/ui/Badge';
-import { formatDate } from '../../lib/utils';
-import { useFrameworksStore } from '../../store/frameworksStore';
+"use client";
+
+import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import { ArrowUpRight, Plus, Search, Filter } from "lucide-react";
+import Button from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import { formatDate } from "@/lib/utils";
+import { useFrameworksStore } from "@/store/frameworksStore";
 
 interface FrameworkItemProps {
   id: string;
   name: string;
-  code: string;
   categories: number;
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   updatedAt: Date;
   channel: string;
 }
 
-const FrameworkItem: React.FC<FrameworkItemProps> = ({ 
-  id, 
-  name, 
-  code, 
-  categories, 
-  status, 
-  updatedAt, 
-  channel 
+const FrameworkItem: React.FC<FrameworkItemProps> = ({
+  id,
+  name,
+  categories,
+  status,
+  updatedAt,
+  channel,
 }) => {
   return (
     <div className="p-4 border-b border-border last:border-0">
@@ -38,18 +33,19 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
           <div className="flex items-center">
             <h3 className="font-medium text-lg">{name}</h3>
             <Badge
-              variant={status === 'published' ? 'success' : 'secondary'}
+              variant={status === "published" ? "success" : "secondary"}
               className="ml-3"
             >
-              {status === 'published' ? 'Published' : 'Draft'}
+              {status === "published" ? "Published" : "Draft"}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-          Channel: {channel} • {categories} categories • Last updated: {formatDate(updatedAt)}
+            Channel: {channel} • {categories} categories • Last updated:{" "}
+            {formatDate(updatedAt)}
           </p>
         </div>
         <div className="flex items-center mt-3 sm:mt-0">
-          <Link to={`/frameworks/${id}`} className="mr-2">
+          <Link href={`/frameworks/${id}`} className="mr-2">
             <Button
               variant="outline"
               size="sm"
@@ -59,12 +55,8 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
               View
             </Button>
           </Link>
-          <Link to={`/frameworks/${id}/edit`} className="mr-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-            >
+          <Link href={`/frameworks/${id}/edit`} className="mr-2">
+            <Button variant="outline" size="sm" className="w-full">
               Edit
             </Button>
           </Link>
@@ -76,7 +68,7 @@ const FrameworkItem: React.FC<FrameworkItemProps> = ({
 
 const FrameworksList: React.FC = () => {
   const { frameworks, loading, error, fetchFrameworks } = useFrameworksStore();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
   const filterRef = useRef<HTMLDivElement>(null);
@@ -91,30 +83,36 @@ const FrameworksList: React.FC = () => {
   // Close filter popup on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target as Node)
+      ) {
         setFilterOpen(false);
       }
     }
     if (filterOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filterOpen]);
 
   // Get unique channel values for filter
-  const channels = Array.from(new Set((frameworks || []).map((fw: any) => fw?.channel).filter(Boolean)));
+  const channels = Array.from(
+    new Set((frameworks || []).map((fw) => fw?.channel).filter(Boolean))
+  );
 
   // Filter frameworks by search query (name or code) and selected channels
-  const filteredFrameworks = (frameworks || []).filter((framework: any) => {
+  const filteredFrameworks = (frameworks || []).filter((framework) => {
     if (!framework) return false;
     const q = search.trim().toLowerCase();
     const matchesSearch =
-      (framework.name?.toLowerCase().includes(q) ||
-      framework.code?.toLowerCase().includes(q));
+      framework.name?.toLowerCase().includes(q) ||
+      framework.code?.toLowerCase().includes(q);
     const matchesChannel =
-      selectedChannels.length === 0 || selectedChannels.includes(framework.channel);
+      selectedChannels.length === 0 ||
+      selectedChannels.includes(framework.channel);
     return matchesSearch && matchesChannel;
   });
 
@@ -127,25 +125,23 @@ const FrameworksList: React.FC = () => {
   };
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
-  if (!frameworks) return <div className="text-center py-8">No frameworks data available.</div>;
+  if (error)
+    return <div className="text-center text-red-500 py-8">{error}</div>;
+  if (!frameworks)
+    return (
+      <div className="text-center py-8">No frameworks data available.</div>
+    );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Frameworks</h1>
-          <p className="text-muted-foreground">
-            Manage and create frameworks
-          </p>
+          <p className="text-muted-foreground">Manage and create frameworks</p>
         </div>
-        <Button
-          leftIcon={<Plus size={16} />}
-        >
-          <Link to="/frameworks/create">
-            Create Framework
-          </Link>
-        </Button>
+        <Link href="/frameworks/create">
+          <Button leftIcon={<Plus size={16} />}>Create Framework</Button>
+        </Link>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 items-center relative">
@@ -158,7 +154,7 @@ const FrameworksList: React.FC = () => {
             placeholder="Search frameworks..."
             className="py-2 pl-10 pr-4 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             autoFocus
           />
         </div>
@@ -174,13 +170,20 @@ const FrameworksList: React.FC = () => {
           </Button>
           {filterOpen && (
             <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-10 p-4 animate-fade-in">
-              <div className="mb-2 font-semibold text-base">Filter by Channel</div>
+              <div className="mb-2 font-semibold text-base">
+                Filter by Channel
+              </div>
               {channels.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No channels available</div>
+                <div className="text-muted-foreground text-sm">
+                  No channels available
+                </div>
               ) : (
                 <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                   {channels.map((ch) => (
-                    <label key={ch} className="flex items-center gap-2 cursor-pointer">
+                    <label
+                      key={ch}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedChannels.includes(ch)}
@@ -199,21 +202,26 @@ const FrameworksList: React.FC = () => {
 
       <Card className="animate-fade-in">
         {filteredFrameworks.length === 0 ? (
-          <div className="p-6 text-center text-muted-foreground">No frameworks found.</div>
+          <div className="p-6 text-center text-muted-foreground">
+            No frameworks found.
+          </div>
         ) : (
-          filteredFrameworks.map((framework: any) => (
-            framework ? (
-              <FrameworkItem
-                key={framework.identifier}
-                id={framework.identifier}
-                name={framework.name}
-                code={framework.code}
-                categories={framework.categories ? framework.categories.length : 0}
-                status={framework.status && framework.status.toLowerCase() === 'live' ? 'published' : 'draft'}
-                updatedAt={framework.lastUpdatedOn ? new Date(framework.lastUpdatedOn) : new Date()}
-                channel={framework.channel}
-              />
-            ) : null
+          filteredFrameworks.map((framework) => (
+            <FrameworkItem
+              key={framework.identifier}
+              id={framework.identifier}
+              name={framework.name}
+              categories={framework.categories?.length || 0}
+              status={
+                framework.status.toLowerCase() === "live"
+                  ? "published"
+                  : "draft"
+              }
+              updatedAt={
+                new Date(framework.lastUpdatedOn || new Date().toISOString())
+              }
+              channel={framework.channel}
+            />
           ))
         )}
       </Card>

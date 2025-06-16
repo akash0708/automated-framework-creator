@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
-import { 
-  Layers, 
-  Users, 
-  FileText,
-  ArrowRight, 
-  ArrowUpRight,
-  BarChart
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import Badge from '../components/ui/Badge';
-import { useFrameworksStore } from '../store/frameworksStore';
+"use client";
+
+import React, { useEffect } from "react";
+import { Layers, FileText, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import Button from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import { useFrameworksStore } from "@/store/frameworksStore";
 
 interface StatCardProps {
   title: string;
@@ -27,9 +22,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => (
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <h4 className="text-2xl font-bold mt-1">{value}</h4>
         </div>
-        <div className="bg-primary/10 p-3 rounded-full">
-          {icon}
-        </div>
+        <div className="bg-primary/10 p-3 rounded-full">{icon}</div>
       </div>
     </CardContent>
   </Card>
@@ -47,7 +40,10 @@ const RecentActivityItem: React.FC<{
       <div>
         <p className="font-medium">
           {id ? (
-            <Link to={`/frameworks/${id}`} className="hover:underline text-black">
+            <Link
+              href={`/frameworks/${id}`}
+              className="hover:underline text-black"
+            >
               {title}
             </Link>
           ) : (
@@ -58,8 +54,14 @@ const RecentActivityItem: React.FC<{
           {user} • {time}
         </p>
       </div>
-      <Badge 
-        variant={status === 'Published' ? 'success' : status === 'Draft' ? 'secondary' : 'default'}
+      <Badge
+        variant={
+          status === "Published"
+            ? "success"
+            : status === "Draft"
+            ? "secondary"
+            : "default"
+        }
       >
         {status}
       </Badge>
@@ -93,13 +95,9 @@ const Dashboard: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         </div>
-        <Button
-          rightIcon={<ArrowRight size={16} />}
-        >
-          <Link to="/frameworks/create">
-            Create Framework
-          </Link>
-        </Button>
+        <Link href="/frameworks/create">
+          <Button rightIcon={<ArrowRight size={16} />}>Create Framework</Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -136,7 +134,9 @@ const Dashboard: React.FC = () => {
             ) : error ? (
               <div className="text-center text-red-500 py-4">{error}</div>
             ) : recentFrameworks.length === 0 ? (
-              <div className="text-center text-muted-foreground py-4">No recent activity.</div>
+              <div className="text-center text-muted-foreground py-4">
+                No recent activity.
+              </div>
             ) : (
               <div className="space-y-0">
                 {recentFrameworks.map((fw) => (
@@ -144,22 +144,30 @@ const Dashboard: React.FC = () => {
                     key={fw.identifier}
                     id={fw.identifier}
                     title={fw.name}
-                    time={fw.lastUpdatedOn ? new Date(fw.lastUpdatedOn).toLocaleString() : 'Unknown'}
-                    status={fw.status && fw.status.toLowerCase() === 'live' ? 'Published' : 'Draft'}
-                    user={fw.channel || 'Unknown'}
+                    time={
+                      fw.lastUpdatedOn
+                        ? new Date(fw.lastUpdatedOn).toLocaleString()
+                        : "Unknown"
+                    }
+                    status={
+                      fw.status && fw.status.toLowerCase() === "live"
+                        ? "Published"
+                        : "Draft"
+                    }
+                    user={fw.channel || "Unknown"}
                   />
                 ))}
               </div>
             )}
-            <Button 
-              className="w-full mt-4" 
-              variant="outline"
-              rightIcon={<ArrowRight size={16} />}
-            >
-              <Link to="/frameworks/">
+            <Link href="/frameworks">
+              <Button
+                className="w-full mt-4"
+                variant="outline"
+                rightIcon={<ArrowRight size={16} />}
+              >
                 View All Frameworks
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

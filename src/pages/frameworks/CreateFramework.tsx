@@ -1,43 +1,52 @@
-import React, { useState } from 'react';
-import { 
-  CheckCircle, 
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  CheckCircle,
   ChevronRight,
-  ArrowLeft, 
-  ArrowRight, 
-  FileCheck, 
-  ListPlus, 
-  ListTree, 
-  Edit3, 
+  ArrowLeft,
+  ArrowRight,
+  FileCheck,
+  ListPlus,
+  ListTree,
+  Edit3,
   Eye,
-  Send
-} from 'lucide-react';
-import Button from '../../components/ui/Button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
-import StepChannel from './steps/StepChannel';
-import StepFramework from './steps/StepFramework';
-import StepCategories from './steps/StepCategories';
-import StepTerms from './steps/StepTerms';
-import StepAssociations from './steps/StepAssociations';
-import StepReview from './steps/StepReview';
-import StepPublish from './steps/StepPublish';
-import { simulateApiCall } from '../../lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { useFrameworkFormStore } from '../../store/frameworkFormStore';
+  Send,
+} from "lucide-react";
+import Button from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import StepChannel from "./steps/StepChannel";
+import StepFramework from "./steps/StepFramework";
+import StepCategories from "./steps/StepCategories";
+import StepTerms from "./steps/StepTerms";
+import StepAssociations from "./steps/StepAssociations";
+import StepReview from "./steps/StepReview";
+import StepPublish from "./steps/StepPublish";
+import { simulateApiCall } from "@/lib/utils";
+import { useFrameworkFormStore } from "@/store/frameworkFormStore";
 
 const steps = [
-  { number: 1, title: 'Channel', icon: <FileCheck size={16} /> },
-  { number: 2, title: 'Framework', icon: <FileCheck size={16} /> },
-  { number: 3, title: 'Categories', icon: <ListPlus size={16} /> },
-  { number: 4, title: 'Terms', icon: <ListTree size={16} /> },
-  { number: 5, title: 'Associations', icon: <Edit3 size={16} /> },
-  { number: 6, title: 'Review', icon: <Eye size={16} /> },
-  { number: 7, title: 'Publish', icon: <Send size={16} /> }
+  { number: 1, title: "Channel", icon: <FileCheck size={16} /> },
+  { number: 2, title: "Framework", icon: <FileCheck size={16} /> },
+  { number: 3, title: "Categories", icon: <ListPlus size={16} /> },
+  { number: 4, title: "Terms", icon: <ListTree size={16} /> },
+  { number: 5, title: "Associations", icon: <Edit3 size={16} /> },
+  { number: 6, title: "Review", icon: <Eye size={16} /> },
+  { number: 7, title: "Publish", icon: <Send size={16} /> },
 ];
 
 const CreateFramework: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { framework, categories, step, setStep, reset, channel } = useFrameworkFormStore();
+  const { framework, categories, step, setStep, channel } =
+    useFrameworkFormStore();
 
   const handleNext = async () => {
     setIsLoading(true);
@@ -47,12 +56,16 @@ const CreateFramework: React.FC = () => {
           // Channel selection step, nothing to submit
           break;
         case 2:
-          await simulateApiCall('/framework/v1/create', 'POST', { request: { framework } });
+          await simulateApiCall("/framework/v1/create", "POST", {
+            request: { framework },
+          });
           break;
         case 3:
           if (categories.length > 0) {
             for (const category of categories) {
-              await simulateApiCall('/framework/v1/category/create', 'POST', { request: { category } });
+              await simulateApiCall("/framework/v1/category/create", "POST", {
+                request: { category },
+              });
             }
           }
           break;
@@ -66,13 +79,13 @@ const CreateFramework: React.FC = () => {
           // Nothing to submit on review step
           break;
         case 7:
-          await simulateApiCall('/framework/v1/publish', 'POST', {});
-          navigate('/frameworks');
+          await simulateApiCall("/framework/v1/publish", "POST", {});
+          router.push("/frameworks");
           return;
       }
       if (step < steps.length) setStep(step + 1);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -96,12 +109,16 @@ const CreateFramework: React.FC = () => {
       <div className="flex justify-between items-center py-4 overflow-x-auto">
         <div className="flex items-center">
           {steps.map((stepObj, i) => (
-            <div 
+            <div
               key={stepObj.number}
-              className={`step-item ${step === stepObj.number ? 'active' : ''} ${step > stepObj.number ? 'complete' : ''}`}
+              className={`step-item ${
+                step === stepObj.number ? "active" : ""
+              } ${step > stepObj.number ? "complete" : ""}`}
             >
-              <div 
-                className={`step ${step === stepObj.number ? 'active' : ''} ${step > stepObj.number ? 'complete' : ''}`}
+              <div
+                className={`step ${step === stepObj.number ? "active" : ""} ${
+                  step > stepObj.number ? "complete" : ""
+                }`}
               >
                 {step > stepObj.number ? (
                   <CheckCircle size={16} />
@@ -109,9 +126,7 @@ const CreateFramework: React.FC = () => {
                   stepObj.number
                 )}
               </div>
-              <p className="text-xs font-medium mt-1">
-                {stepObj.title}
-              </p>
+              <p className="text-xs font-medium mt-1">{stepObj.title}</p>
               {i < steps.length - 1 && (
                 <div className="hidden sm:block absolute -right-3 top-1/3 transform -translate-y-1/2">
                   <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -131,7 +146,7 @@ const CreateFramework: React.FC = () => {
             Step {step}: {steps[step - 1].title}
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent>
           {step === 1 && <StepChannel />}
           {step === 2 && <StepFramework />}
@@ -141,7 +156,7 @@ const CreateFramework: React.FC = () => {
           {step === 6 && <StepReview />}
           {step === 7 && <StepPublish />}
         </CardContent>
-        
+
         <CardFooter className="flex justify-between border-t border-border pt-4">
           <Button
             variant="outline"
@@ -154,10 +169,12 @@ const CreateFramework: React.FC = () => {
           <Button
             onClick={handleNext}
             isLoading={isLoading}
-            rightIcon={step < steps.length ? <ArrowRight size={16} /> : undefined}
+            rightIcon={
+              step < steps.length ? <ArrowRight size={16} /> : undefined
+            }
             disabled={(step === 1 && !channel?.code) || isLoading}
           >
-            {step < steps.length ? 'Continue' : 'Publish Framework'}
+            {step < steps.length ? "Continue" : "Publish Framework"}
           </Button>
         </CardFooter>
       </Card>

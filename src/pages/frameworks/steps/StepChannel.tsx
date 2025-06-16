@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
+import React, { useEffect, useState } from "react";
+import { useFrameworkFormStore } from "../../../store/frameworkFormStore";
 
 interface Channel {
   identifier: string;
@@ -21,34 +21,39 @@ const StepChannel: React.FC = () => {
       setError(null);
       try {
         const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        myHeaders.append('tenantId', import.meta.env.VITE_TENANT_ID);
-        myHeaders.append('Authorization', `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`);
-        myHeaders.append('Cookie', import.meta.env.VITE_COOKIE);
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("tenantId", process.env.NEXT_PUBLIC_TENANT_ID);
+        myHeaders.append(
+          "Authorization",
+          `Bearer ${process.env.NEXT_PUBLIC_AUTH_TOKEN}`
+        );
+        myHeaders.append("Cookie", process.env.NEXT_PUBLIC_COOKIE);
 
         const raw = JSON.stringify({
           request: {
             filters: {
-              status: ['Live'],
-              objectType: 'Channel',
+              status: ["Live"],
+              objectType: "Channel",
             },
           },
         });
 
         const requestOptions = {
-          method: 'POST',
+          method: "POST",
           headers: myHeaders,
           body: raw,
-          redirect: 'follow' as RequestRedirect,
+          redirect: "follow" as RequestRedirect,
         };
 
-        const url = `${import.meta.env.VITE_INTERFACE_URL}/action/composite/v3/search`;
+        const url = `${process.env.NEXT_PUBLIC_INTERFACE_URL}/action/composite/v3/search`;
         const response = await fetch(url, requestOptions);
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
-        setChannels(Array.isArray(data.result.Channel) ? data.result.Channel : []);
+        setChannels(
+          Array.isArray(data.result.Channel) ? data.result.Channel : []
+        );
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch channels');
+        setError(err.message || "Failed to fetch channels");
       } finally {
         setLoading(false);
       }
@@ -75,14 +80,16 @@ const StepChannel: React.FC = () => {
           <label className="block text-sm font-medium mb-2">Channel</label>
           <select
             className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            value={channel?.code || ''}
-            onChange={e => {
-              const selected = channels.find(ch => ch.code === e.target.value);
+            value={channel?.code || ""}
+            onChange={(e) => {
+              const selected = channels.find(
+                (ch) => ch.code === e.target.value
+              );
               if (selected) setChannel(selected);
             }}
           >
             <option value="">Select a channel...</option>
-            {channels.map(ch => (
+            {channels.map((ch) => (
               <option key={ch.code} value={ch.code}>
                 {ch.name} ({ch.code})
               </option>
@@ -94,4 +101,4 @@ const StepChannel: React.FC = () => {
   );
 };
 
-export default StepChannel; 
+export default StepChannel;
